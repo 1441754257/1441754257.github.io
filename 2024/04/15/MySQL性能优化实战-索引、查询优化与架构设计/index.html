@@ -1,0 +1,1094 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="贾一">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="MySQL性能优化实战-索引、查询优化与架构设计 MySQL是最流行的关系型数据库，性能优化是后端工程师的核心技能。本文将系统讲解MySQL索引原理、查询优化技巧、架构设计方案及调优实战。  一、MySQL架构概述1.1 MySQL整体架构12345678910111213141516171819202122232425262728┌────────────────────────────────">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL性能优化实战-索引、查询优化与架构设计">
+<meta property="og:url" content="https://1441754257.github.io/2024/04/15/MySQL%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98-%E7%B4%A2%E5%BC%95%E3%80%81%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E4%B8%8E%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="贾一的技术博客">
+<meta property="og:description" content="MySQL性能优化实战-索引、查询优化与架构设计 MySQL是最流行的关系型数据库，性能优化是后端工程师的核心技能。本文将系统讲解MySQL索引原理、查询优化技巧、架构设计方案及调优实战。  一、MySQL架构概述1.1 MySQL整体架构12345678910111213141516171819202122232425262728┌────────────────────────────────">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-04-15T06:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T02:42:36.269Z">
+<meta property="article:author" content="贾一">
+<meta property="article:tag" content="性能调优">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="索引优化">
+<meta property="article:tag" content="查询优化">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>MySQL性能优化实战-索引、查询优化与架构设计 - 贾一的技术博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1441754257.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>贾一的技术博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MySQL性能优化实战-索引、查询优化与架构设计"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-04-15 14:00" pubdate>
+          2024年4月15日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          116 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">MySQL性能优化实战-索引、查询优化与架构设计</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="MySQL性能优化实战-索引、查询优化与架构设计"><a href="#MySQL性能优化实战-索引、查询优化与架构设计" class="headerlink" title="MySQL性能优化实战-索引、查询优化与架构设计"></a>MySQL性能优化实战-索引、查询优化与架构设计</h1><blockquote>
+<p>MySQL是最流行的关系型数据库，性能优化是后端工程师的核心技能。本文将系统讲解MySQL索引原理、查询优化技巧、架构设计方案及调优实战。</p>
+</blockquote>
+<h2 id="一、MySQL架构概述"><a href="#一、MySQL架构概述" class="headerlink" title="一、MySQL架构概述"></a>一、MySQL架构概述</h2><h3 id="1-1-MySQL整体架构"><a href="#1-1-MySQL整体架构" class="headerlink" title="1.1 MySQL整体架构"></a>1.1 MySQL整体架构</h3><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">┌─────────────────────────────────────────────────────────────┐<br>│                     MySQL架构层次                           │<br>├─────────────────────────────────────────────────────────────┤<br>│  ┌─────────────────────────────────────────────────────┐   │<br>│  │                 连接层(Connection Layer)            │   │<br>│  │   连接池、认证、线程管理                             │   │<br>│  └─────────────────────────────────────────────────────┘   │<br>├─────────────────────────────────────────────────────────────┤<br>│  ┌─────────────────────────────────────────────────────┐   │<br>│  │                 服务层(Server Layer)                │   │<br>│  │   ┌──────────┐ ┌──────────┐ ┌──────────┐          │   │<br>│  │   │ 解析器   │ │ 优化器   │ │ 执行器   │          │   │<br>│  │   └──────────┘ └──────────┘ └──────────┘          │   │<br>│  │   ┌──────────┐ ┌──────────┐ ┌──────────┐          │   │<br>│  │   │ 查询缓存 │ │ 缓存池   │ │ 日志系统 │          │   │<br>│  │   └──────────┘ └──────────┘ └──────────┘          │   │<br>│  └─────────────────────────────────────────────────────┘   │<br>├─────────────────────────────────────────────────────────────┤<br>│  ┌─────────────────────────────────────────────────────┐   │<br>│  │               存储引擎层(Engine Layer)              │   │<br>│  │   InnoDB |<span class="hljs-string"> MyISAM </span>|<span class="hljs-string"> Memory </span>|<span class="hljs-string"> Archive </span>|<span class="hljs-string"> ...         │   │</span><br><span class="hljs-string">│  └─────────────────────────────────────────────────────┘   │</span><br><span class="hljs-string">├─────────────────────────────────────────────────────────────┤</span><br><span class="hljs-string">│  ┌─────────────────────────────────────────────────────┐   │</span><br><span class="hljs-string">│  │               文件系统层(File System)               │   │</span><br><span class="hljs-string">│  │   数据文件 </span>|<span class="hljs-string"> 日志文件 </span>|<span class="hljs-string"> 配置文件                     │   │</span><br><span class="hljs-string">│  └─────────────────────────────────────────────────────┘   │</span><br><span class="hljs-string">└─────────────────────────────────────────────────────────────┘</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="1-2-InnoDB存储引擎"><a href="#1-2-InnoDB存储引擎" class="headerlink" title="1.2 InnoDB存储引擎"></a>1.2 InnoDB存储引擎</h3><p><strong>InnoDB架构</strong></p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs arcade">┌─────────────────────────────────────────────────────────────┐<br>│                    InnoDB内存结构                           │<br>├─────────────────────────────────────────────────────────────┤<br>│  ┌─────────────────────────────────────────────────────┐   │<br>│  │              <span class="hljs-built_in">Buffer</span> Pool(缓冲池)                    │   │<br>│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐   │   │<br>│  │  │数据页   │ │索引页   │ │自适应哈希│ │锁信息   │   │   │<br>│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘   │   │<br>│  └─────────────────────────────────────────────────────┘   │<br>│  ┌─────────────────┐ ┌─────────────────────────────────┐   │<br>│  │ Change <span class="hljs-built_in">Buffer</span>   │         <span class="hljs-built_in">Log</span> <span class="hljs-built_in">Buffer</span>               │   │<br>│  │ (变更缓冲区)    │         (日志缓冲区)              │   │<br>│  └─────────────────┘ └─────────────────────────────────┘   │<br>└─────────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>InnoDB特性</strong></p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>事务支持</td>
+<td>ACID特性，支持XA分布式事务</td>
+</tr>
+<tr>
+<td>行级锁</td>
+<td>高并发场景性能好</td>
+</tr>
+<tr>
+<td>外键约束</td>
+<td>支持外键关联</td>
+</tr>
+<tr>
+<td>MVCC</td>
+<td>多版本并发控制，读写不冲突</td>
+</tr>
+<tr>
+<td>崩溃恢复</td>
+<td>基于Redo Log的崩溃恢复</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、索引原理与优化"><a href="#二、索引原理与优化" class="headerlink" title="二、索引原理与优化"></a>二、索引原理与优化</h2><h3 id="2-1-索引数据结构"><a href="#2-1-索引数据结构" class="headerlink" title="2.1 索引数据结构"></a>2.1 索引数据结构</h3><p><strong>B+Tree结构</strong></p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs scss">                    ┌───────────────┐<br>                    │   根节点(<span class="hljs-number">15</span>)  │<br>                    └───────┬───────┘<br>          ┌─────────────────┼─────────────────┐<br>          ▼                 ▼                 ▼<br>   ┌──────────────┐ ┌──────────────┐ ┌──────────────┐<br>   │  中间节点(<span class="hljs-number">5</span>) │ │  中间节点(<span class="hljs-number">15</span>)│ │  中间节点(<span class="hljs-number">25</span>)│<br>   └──────┬───────┘ └──────┬───────┘ └──────┬───────┘<br>          │                │                │<br>   ┌──────┴──────┐  ┌──────┴──────┐  ┌──────┴──────┐<br>   ▼             ▼  ▼             ▼  ▼             ▼<br>┌─────┐      ┌─────┐ ┌─────┐    ┌─────┐ ┌─────┐    ┌─────┐<br>│<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>│──────│<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>│ │<span class="hljs-number">11</span>-<span class="hljs-number">14</span>│───│<span class="hljs-number">15</span>-<span class="hljs-number">19</span>│ │<span class="hljs-number">20</span>-<span class="hljs-number">24</span>│───│<span class="hljs-number">25</span>-<span class="hljs-number">30</span>│<br>└─────┘      └─────┘ └─────┘    └─────┘ └─────┘    └─────┘<br>     叶子节点(双向链表连接，按顺序存储数据)<br></code></pre></td></tr></table></figure>
+
+<p><strong>B+Tree特点</strong></p>
+<ol>
+<li>非叶子节点只存储键值，不存储数据</li>
+<li>叶子节点存储所有键值和数据</li>
+<li>叶子节点通过双向链表连接</li>
+<li>树高度低（通常3层可存千万级数据）</li>
+</ol>
+<h3 id="2-2-索引类型"><a href="#2-2-索引类型" class="headerlink" title="2.2 索引类型"></a>2.2 索引类型</h3><p><strong>聚簇索引</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 主键自动创建聚簇索引</span><br><span class="hljs-keyword">CREATE TABLE</span> <span class="hljs-keyword">user</span> (<br>    id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,      <span class="hljs-comment">-- 聚簇索引</span><br>    name <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">50</span>),<br>    age <span class="hljs-type">INT</span><br>);<br><br><span class="hljs-comment">-- 数据存储结构：</span><br><span class="hljs-comment">-- id=1: [1, &#x27;张三&#x27;, 25]</span><br><span class="hljs-comment">-- id=2: [2, &#x27;李四&#x27;, 30]</span><br><span class="hljs-comment">-- id=3: [3, &#x27;王五&#x27;, 28]</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>二级索引（辅助索引）</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 创建二级索引</span><br><span class="hljs-keyword">CREATE</span> INDEX idx_name <span class="hljs-keyword">ON</span> <span class="hljs-keyword">user</span>(name);<br><br><span class="hljs-comment">-- 二级索引结构：</span><br><span class="hljs-comment">-- name=&#x27;张三&#x27; → 主键值=1</span><br><span class="hljs-comment">-- name=&#x27;李四&#x27; → 主键值=2</span><br><br><span class="hljs-comment">-- 查询过程：二级索引 → 回表查询聚簇索引</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>联合索引</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 联合索引</span><br><span class="hljs-keyword">CREATE</span> INDEX idx_name_age <span class="hljs-keyword">ON</span> <span class="hljs-keyword">user</span>(name, age);<br><br><span class="hljs-comment">-- 最左前缀原则</span><br><span class="hljs-comment">-- ✓ 有效：WHERE name = &#x27;张三&#x27;</span><br><span class="hljs-comment">-- ✓ 有效：WHERE name = &#x27;张三&#x27; AND age = 25</span><br><span class="hljs-comment">-- ✗ 无效：WHERE age = 25  (缺少最左列)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-3-索引优化策略"><a href="#2-3-索引优化策略" class="headerlink" title="2.3 索引优化策略"></a>2.3 索引优化策略</h3><p><strong>索引选择性</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 计算选择性（越接近1越好）</span><br><span class="hljs-keyword">SELECT</span> <br>    <span class="hljs-built_in">COUNT</span>(<span class="hljs-keyword">DISTINCT</span> column_name) <span class="hljs-operator">/</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">AS</span> selectivity<br><span class="hljs-keyword">FROM</span> table_name;<br><br><span class="hljs-comment">-- 选择性高的列适合建索引</span><br><span class="hljs-comment">-- 选择性低（如性别、状态）不适合单独建索引</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>覆盖索引</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 覆盖索引：查询字段都在索引中，无需回表</span><br><span class="hljs-keyword">CREATE</span> INDEX idx_cover <span class="hljs-keyword">ON</span> <span class="hljs-keyword">user</span>(name, age);<br><br><span class="hljs-comment">-- 使用覆盖索引</span><br><span class="hljs-keyword">SELECT</span> name, age <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;张三&#x27;</span>;<br><br><span class="hljs-comment">-- EXPLAIN结果：Using index</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>索引下推（ICP）</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- MySQL 5.6+ 索引下推优化</span><br><span class="hljs-keyword">CREATE</span> INDEX idx_name_age <span class="hljs-keyword">ON</span> <span class="hljs-keyword">user</span>(name, age);<br><br><span class="hljs-comment">-- 优化前：存储引擎返回所有name=&#x27;张三&#x27;的记录，Server层过滤age</span><br><span class="hljs-comment">-- 优化后：存储引擎直接过滤name和age，减少回表次数</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> name <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;张%&#x27;</span> <span class="hljs-keyword">AND</span> age <span class="hljs-operator">=</span> <span class="hljs-number">25</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-4-索引失效场景"><a href="#2-4-索引失效场景" class="headerlink" title="2.4 索引失效场景"></a>2.4 索引失效场景</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 1. 查询条件使用函数</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">YEAR</span>(create_time) <span class="hljs-operator">=</span> <span class="hljs-number">2024</span>;<br><span class="hljs-comment">-- 优化：SELECT * FROM user WHERE create_time &gt;= &#x27;2024-01-01&#x27; AND create_time &lt; &#x27;2025-01-01&#x27;;</span><br><br><span class="hljs-comment">-- 2. 隐式类型转换</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> phone <span class="hljs-operator">=</span> <span class="hljs-number">13800138000</span>;  <span class="hljs-comment">-- phone是VARCHAR</span><br><span class="hljs-comment">-- 优化：SELECT * FROM user WHERE phone = &#x27;13800138000&#x27;;</span><br><br><span class="hljs-comment">-- 3. LIKE以%开头</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> name <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;%张&#x27;</span>;<br><span class="hljs-comment">-- 优化：SELECT * FROM user WHERE name LIKE &#x27;张%&#x27;;</span><br><br><span class="hljs-comment">-- 4. OR连接非索引列</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;张三&#x27;</span> <span class="hljs-keyword">OR</span> age <span class="hljs-operator">=</span> <span class="hljs-number">25</span>;<br><span class="hljs-comment">-- 优化：使用UNION ALL</span><br><br><span class="hljs-comment">-- 5. 负向查询</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> status <span class="hljs-operator">!=</span> <span class="hljs-number">1</span>;<br><span class="hljs-comment">-- 优化：SELECT * FROM user WHERE status IN (0, 2, 3);</span><br><br><span class="hljs-comment">-- 6. IS NULL / IS NOT NULL（部分情况）</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> name <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NULL</span>;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、查询优化"><a href="#三、查询优化" class="headerlink" title="三、查询优化"></a>三、查询优化</h2><h3 id="3-1-EXPLAIN执行计划"><a href="#3-1-EXPLAIN执行计划" class="headerlink" title="3.1 EXPLAIN执行计划"></a>3.1 EXPLAIN执行计划</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">EXPLAIN <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;张三&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<p><strong>重要字段解读</strong></p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+<th>关注值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>查询标识</td>
+<td>相同则顺序执行，不同则大的先执行</td>
+</tr>
+<tr>
+<td>select_type</td>
+<td>查询类型</td>
+<td>SIMPLE(简单)、SUBQUERY(子查询)、DERIVED(派生)</td>
+</tr>
+<tr>
+<td>type</td>
+<td>访问类型</td>
+<td>system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL</td>
+</tr>
+<tr>
+<td>key</td>
+<td>使用的索引</td>
+<td>NULL表示未使用索引</td>
+</tr>
+<tr>
+<td>rows</td>
+<td>预估扫描行数</td>
+<td>越小越好</td>
+</tr>
+<tr>
+<td>Extra</td>
+<td>额外信息</td>
+<td>Using index(覆盖索引)、Using filesort(文件排序)、Using temporary(临时表)</td>
+</tr>
+</tbody></table>
+<p><strong>type类型详解</strong></p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">性能从好到差：<br>┌────────────────────────────────────────────────────────┐<br>│ <span class="hljs-keyword">system</span> &gt; const &gt; eq_ref &gt; <span class="hljs-keyword">ref</span> &gt; range &gt; <span class="hljs-keyword">index</span> &gt; <span class="hljs-keyword">ALL</span>   │<br>│                                                        │<br>│ <span class="hljs-keyword">system</span>: 系统表，只有一条数据                            │<br>│ const: 主键或唯一索引查询，最多一条                      │<br>│ eq_ref: <span class="hljs-keyword">JOIN</span>时使用主键或唯一索引                        │<br>│ <span class="hljs-keyword">ref</span>: 非唯一索引查询                                    │<br>│ range: 范围查询(<span class="hljs-keyword">BETWEEN</span>, &gt;, &lt;, <span class="hljs-keyword">IN</span>)                     │<br>│ <span class="hljs-keyword">index</span>: 全索引扫描                                      │<br>│ <span class="hljs-keyword">ALL</span>: 全表扫描(最差)                                    │<br>└────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-2-慢查询优化"><a href="#3-2-慢查询优化" class="headerlink" title="3.2 慢查询优化"></a>3.2 慢查询优化</h3><p><strong>开启慢查询日志</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 查看配置</span><br><span class="hljs-keyword">SHOW</span> VARIABLES <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;slow_query%&#x27;</span>;<br><span class="hljs-keyword">SHOW</span> VARIABLES <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;long_query_time&#x27;</span>;<br><br><span class="hljs-comment">-- 开启慢查询日志</span><br><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> slow_query_log <span class="hljs-operator">=</span> <span class="hljs-keyword">ON</span>;<br><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> long_query_time <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;  <span class="hljs-comment">-- 超过1秒记录</span><br><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> slow_query_log_file <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;/var/log/mysql/slow.log&#x27;</span>;<br><br><span class="hljs-comment">-- 记录未使用索引的查询</span><br><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> log_queries_not_using_indexes <span class="hljs-operator">=</span> <span class="hljs-keyword">ON</span>;<br></code></pre></td></tr></table></figure>
+
+<p><strong>慢查询分析工具</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># mysqldumpslow分析</span><br>mysqldumpslow -s t -t 10 /var/log/mysql/slow.log<br><br><span class="hljs-comment"># 参数说明</span><br>-s t: 按查询时间排序<br>-t 10: 显示前10条<br>-s c: 按查询次数排序<br>-s l: 按锁定时间排序<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-3-常见优化场景"><a href="#3-3-常见优化场景" class="headerlink" title="3.3 常见优化场景"></a>3.3 常见优化场景</h3><p><strong>分页优化</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 问题：大偏移量分页性能差</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> LIMIT <span class="hljs-number">100000</span>, <span class="hljs-number">10</span>;<br><br><span class="hljs-comment">-- 方案1：使用子查询优化</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> a <br><span class="hljs-keyword">JOIN</span> (<span class="hljs-keyword">SELECT</span> id <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> LIMIT <span class="hljs-number">100000</span>, <span class="hljs-number">10</span>) b <br><span class="hljs-keyword">ON</span> a.id <span class="hljs-operator">=</span> b.id;<br><br><span class="hljs-comment">-- 方案2：使用游标分页</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> id <span class="hljs-operator">&gt;</span> <span class="hljs-number">100000</span> LIMIT <span class="hljs-number">10</span>;<br></code></pre></td></tr></table></figure>
+
+<p><strong>COUNT优化</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- COUNT(*) vs COUNT(1) vs COUNT(列)</span><br><span class="hljs-comment">-- 性能：COUNT(*) ≈ COUNT(1) &gt; COUNT(列)</span><br><br><span class="hljs-comment">-- 优化：使用缓存计数</span><br><span class="hljs-keyword">CREATE TABLE</span> counter (<br>    table_name <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">50</span>) <span class="hljs-keyword">PRIMARY KEY</span>,<br>    row_count <span class="hljs-type">INT</span><br>);<br></code></pre></td></tr></table></figure>
+
+<p><strong>ORDER BY优化</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 问题：Using filesort</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> create_time LIMIT <span class="hljs-number">10</span>;<br><br><span class="hljs-comment">-- 优化：为排序字段建索引</span><br><span class="hljs-keyword">CREATE</span> INDEX idx_create_time <span class="hljs-keyword">ON</span> <span class="hljs-keyword">user</span>(create_time);<br><br><span class="hljs-comment">-- 联合索引排序</span><br><span class="hljs-keyword">CREATE</span> INDEX idx_age_name <span class="hljs-keyword">ON</span> <span class="hljs-keyword">user</span>(age, name);<br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> age <span class="hljs-operator">=</span> <span class="hljs-number">25</span> <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> name;  <span class="hljs-comment">-- 使用索引排序</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>GROUP BY优化</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 问题：Using temporary; Using filesort</span><br><span class="hljs-keyword">SELECT</span> age, <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> age;<br><br><span class="hljs-comment">-- 优化：使用索引</span><br><span class="hljs-keyword">CREATE</span> INDEX idx_age <span class="hljs-keyword">ON</span> <span class="hljs-keyword">user</span>(age);<br><br><span class="hljs-comment">-- 松散索引扫描</span><br><span class="hljs-keyword">SELECT</span> age, <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> age;<br><span class="hljs-comment">-- Extra: Using index for group-by</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、事务与锁"><a href="#四、事务与锁" class="headerlink" title="四、事务与锁"></a>四、事务与锁</h2><h3 id="4-1-事务隔离级别"><a href="#4-1-事务隔离级别" class="headerlink" title="4.1 事务隔离级别"></a>4.1 事务隔离级别</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 查看隔离级别</span><br><span class="hljs-keyword">SELECT</span> @<span class="hljs-variable">@transaction_isolation</span>;<br><br><span class="hljs-comment">-- 设置隔离级别</span><br><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> transaction_isolation <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;READ-COMMITTED&#x27;</span>;<br><span class="hljs-keyword">SET</span> SESSION transaction_isolation <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;REPEATABLE-READ&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<p><strong>四种隔离级别</strong></p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>READ UNCOMMITTED</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>读未提交</td>
+</tr>
+<tr>
+<td>READ COMMITTED</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>读已提交(RC)</td>
+</tr>
+<tr>
+<td>REPEATABLE READ</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓(InnoDB解决)</td>
+<td>可重复读(RR，默认)</td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td>✗</td>
+<td>✗</td>
+<td>✗</td>
+<td>串行化</td>
+</tr>
+</tbody></table>
+<h3 id="4-2-MVCC原理"><a href="#4-2-MVCC原理" class="headerlink" title="4.2 MVCC原理"></a>4.2 MVCC原理</h3><p><strong>Read View结构</strong></p>
+<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cos">┌─────────────────────────────────────────────────────────┐<br>│                    <span class="hljs-keyword">Read</span> <span class="hljs-keyword">View</span>                            │<br>├─────────────────────────────────────────────────────────┤<br>│  m_ids: 当前活跃事务ID列表                              │<br>│  min_trx_id: 活跃事务中最小ID                           │<br>│  max_trx_id: 下一个将分配的事务ID                       │<br>│  creator_trx_id: 创建该<span class="hljs-keyword">Read</span> <span class="hljs-keyword">View</span>的事务ID               │<br>└─────────────────────────────────────────────────────────┘<br><br>可见性判断：<br><span class="hljs-number">1.</span> trx_id == creator_trx_id → 自己修改的，可见<br><span class="hljs-number">2.</span> trx_id &lt; min_trx_id → 事务已提交，可见<br><span class="hljs-number">3.</span> trx_id &gt;= max_trx_id → 事务在<span class="hljs-keyword">Read</span> <span class="hljs-keyword">View</span>之后开启，不可见<br><span class="hljs-number">4.</span> min_trx_id &lt;= trx_id &lt; max_trx_id → 在m_ids中则不可见，否则可见<br></code></pre></td></tr></table></figure>
+
+<p><strong>Undo Log版本链</strong></p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-attribute">TRX_ID</span>=100: INSERT user(<span class="hljs-attribute">id</span>=1, <span class="hljs-attribute">name</span>=<span class="hljs-string">&#x27;张三&#x27;</span>)<br><span class="hljs-attribute">TRX_ID</span>=101: UPDATE<span class="hljs-built_in"> user </span><span class="hljs-built_in">SET</span> <span class="hljs-attribute">name</span>=<span class="hljs-string">&#x27;李四&#x27;</span> WHERE <span class="hljs-attribute">id</span>=1<br><span class="hljs-attribute">TRX_ID</span>=102: UPDATE<span class="hljs-built_in"> user </span><span class="hljs-built_in">SET</span> <span class="hljs-attribute">name</span>=<span class="hljs-string">&#x27;王五&#x27;</span> WHERE <span class="hljs-attribute">id</span>=1<br><br>版本链：<br>┌─────────────────────────────────────────────────┐<br>│ 当前数据: <span class="hljs-attribute">name</span>=<span class="hljs-string">&#x27;王五&#x27;</span>, <span class="hljs-attribute">trx_id</span>=102, roll_ptr ────┼──┐<br>└─────────────────────────────────────────────────┘  │<br>                                                      ▼<br>┌─────────────────────────────────────────────────┐<br>│ Undo Log: <span class="hljs-attribute">name</span>=<span class="hljs-string">&#x27;李四&#x27;</span>, <span class="hljs-attribute">trx_id</span>=101, roll_ptr ────┼──┐<br>└─────────────────────────────────────────────────┘  │<br>                                                      ▼<br>┌─────────────────────────────────────────────────┐<br>│ Undo Log: <span class="hljs-attribute">name</span>=<span class="hljs-string">&#x27;张三&#x27;</span>, <span class="hljs-attribute">trx_id</span>=100               │<br>└─────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-锁机制"><a href="#4-3-锁机制" class="headerlink" title="4.3 锁机制"></a>4.3 锁机制</h3><p><strong>锁类型</strong></p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs scss">┌─────────────────────────────────────────────────────────┐<br>│                    MySQL锁类型                          │<br>├─────────────────────────────────────────────────────────┤<br>│  ┌─────────────────────────────────────────────────┐   │<br>│  │               全局锁                             │   │<br>│  │   锁整个数据库实例(Flush tables with read lock) │   │<br>│  └─────────────────────────────────────────────────┘   │<br>│  ┌─────────────────────────────────────────────────┐   │<br>│  │               表级锁                             │   │<br>│  │   表锁(LOCK TABLES)、元数据锁(MDL)、意向锁      │   │<br>│  └─────────────────────────────────────────────────┘   │<br>│  ┌─────────────────────────────────────────────────┐   │<br>│  │               行级锁(InnoDB)                     │   │<br>│  │   Record <span class="hljs-built_in">Lock</span>(记录锁)                           │   │<br>│  │   <span class="hljs-attribute">Gap</span> <span class="hljs-built_in">Lock</span>(间隙锁)                              │   │<br>│  │   Next-Key <span class="hljs-built_in">Lock</span>(临键锁)                         │   │<br>│  │   Insert Intention <span class="hljs-built_in">Lock</span>(插入意向锁)             │   │<br>│  └─────────────────────────────────────────────────┘   │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>查看锁信息</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- MySQL 8.0+</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> performance_schema.data_locks;<br><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> performance_schema.data_lock_waits;<br><br><span class="hljs-comment">-- 查看锁等待</span><br><span class="hljs-keyword">SHOW</span> ENGINE INNODB STATUS\G<br></code></pre></td></tr></table></figure>
+
+<p><strong>死锁检测与处理</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 查看死锁日志</span><br><span class="hljs-keyword">SHOW</span> ENGINE INNODB STATUS\G<br><br><span class="hljs-comment">-- 设置锁等待超时</span><br><span class="hljs-keyword">SET</span> innodb_lock_wait_timeout <span class="hljs-operator">=</span> <span class="hljs-number">50</span>;  <span class="hljs-comment">-- 默认50秒</span><br><br><span class="hljs-comment">-- 开启死锁检测</span><br><span class="hljs-keyword">SET</span> innodb_deadlock_detect <span class="hljs-operator">=</span> <span class="hljs-keyword">ON</span>;  <span class="hljs-comment">-- 默认开启</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、数据库架构设计"><a href="#五、数据库架构设计" class="headerlink" title="五、数据库架构设计"></a>五、数据库架构设计</h2><h3 id="5-1-分库分表"><a href="#5-1-分库分表" class="headerlink" title="5.1 分库分表"></a>5.1 分库分表</h3><p><strong>水平分表策略</strong></p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs mathematica">┌─────────────────────────────────────────────────────────┐<br>│                    分表策略                             │<br>├─────────────────────────────────────────────────────────┤<br>│                                                         │<br>│  <span class="hljs-number">1.</span> 范围分片<span class="hljs-punctuation">(</span><span class="hljs-built_in">Range</span><span class="hljs-punctuation">)</span>                                    │<br>│     <span class="hljs-type">user_</span><span class="hljs-number">0</span><span class="hljs-operator">:</span> <span class="hljs-variable">id</span> <span class="hljs-number">1</span><span class="hljs-operator">-</span><span class="hljs-number">1000000</span>                              │<br>│     <span class="hljs-type">user_</span><span class="hljs-number">1</span><span class="hljs-operator">:</span> <span class="hljs-variable">id</span> <span class="hljs-number">1000001</span><span class="hljs-operator">-</span><span class="hljs-number">2000000</span>                        │<br>│     优点：范围查询友好                                 │<br>│     缺点：数据倾斜、热点问题                           │<br>│                                                         │<br>│  <span class="hljs-number">2.</span> 哈希分片<span class="hljs-punctuation">(</span><span class="hljs-built_in">Hash</span><span class="hljs-punctuation">)</span>                                     │<br>│     <span class="hljs-type">table_index</span> <span class="hljs-operator">=</span> <span class="hljs-variable">id</span> <span class="hljs-operator">%</span> <span class="hljs-built_in">N</span>                              │<br>│     优点：数据均匀分布                                 │<br>│     缺点：范围查询需要扫描所有分片                     │<br>│                                                         │<br>│  <span class="hljs-number">3.</span> 一致性哈希<span class="hljs-punctuation">(</span><span class="hljs-variable">Consistent</span> <span class="hljs-built_in">Hash</span><span class="hljs-punctuation">)</span>                        │<br>│     解决扩缩容数据迁移问题                             │<br>│                                                         │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>分库分表中间件</strong></p>
+<table>
+<thead>
+<tr>
+<th>中间件</th>
+<th>类型</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ShardingSphere</td>
+<td>客户端</td>
+<td>Apache项目，功能全面</td>
+</tr>
+<tr>
+<td>MyCat</td>
+<td>服务端</td>
+<td>基于MySQL协议，透明代理</td>
+</tr>
+<tr>
+<td>Vitess</td>
+<td>服务端</td>
+<td>YouTube开源，支持MySQL</td>
+</tr>
+</tbody></table>
+<h3 id="5-2-主从复制"><a href="#5-2-主从复制" class="headerlink" title="5.2 主从复制"></a>5.2 主从复制</h3><p><strong>复制架构</strong></p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">┌──────────────────────────────────────────────────────────┐<br>│                   主从复制架构                           │<br>├──────────────────────────────────────────────────────────┤<br>│                                                         │<br>│   ┌──────────┐   Binlog   ┌──────────┐                 │<br>│   │  <span class="hljs-keyword">Master</span>  <span class="hljs-title">│ ─────────▶ │  Slave1</span>  │                 │<br>│   │  (写)    │            │  (读)    │                 │<br>│   └──────────┘            └──────────┘                 │<br>│        │                                                  │<br>│        │ Binlog                                          │<br>│        ▼                                                  │<br>│   ┌──────────┐                                          │<br>│   │  Slave2  │                                          │<br>│   │  (读)    │                                          │<br>│   └──────────┘                                          │<br>│                                                         │<br>└──────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>复制模式</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 异步复制(默认)</span><br><span class="hljs-comment">-- Master提交后立即返回，不等待Slave同步</span><br><span class="hljs-comment">-- 优点：性能好</span><br><span class="hljs-comment">-- 缺点：可能丢数据</span><br><br><span class="hljs-comment">-- 半同步复制</span><br><span class="hljs-comment">-- Master等待至少一个Slave确认收到Binlog</span><br><span class="hljs-comment">-- 优点：数据更安全</span><br><span class="hljs-comment">-- 缺点：性能略降</span><br><br><span class="hljs-comment">-- 全同步复制</span><br><span class="hljs-comment">-- Master等待所有Slave确认</span><br><span class="hljs-comment">-- 优点：数据最安全</span><br><span class="hljs-comment">-- 缺点：性能差</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="5-3-读写分离"><a href="#5-3-读写分离" class="headerlink" title="5.3 读写分离"></a>5.3 读写分离</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// ShardingSphere配置示例</span><br>spring:<br>  shardingsphere:<br>    datasource:<br>      names: master,slave0<br>      master:<br>        type: com.zaxxer.hikari.HikariDataSource<br>        driver-class-name: com.mysql.cj.jdbc.Driver<br>        jdbc-url: jdbc:mysql:<span class="hljs-comment">//master:3306/mydb</span><br>      slave0:<br>        type: com.zaxxer.hikari.HikariDataSource<br>        driver-class-name: com.mysql.cj.jdbc.Driver<br>        jdbc-url: jdbc:mysql:<span class="hljs-comment">//slave:3306/mydb</span><br>    rules:<br>      readwrite-splitting:<br>        data-sources:<br>          myds:<br>            write-data-source-name: master<br>            read-data-source-names: slave0<br>            load-balancer-name: round_robin<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、性能调优实战"><a href="#六、性能调优实战" class="headerlink" title="六、性能调优实战"></a>六、性能调优实战</h2><h3 id="6-1-参数优化"><a href="#6-1-参数优化" class="headerlink" title="6.1 参数优化"></a>6.1 参数优化</h3><p><strong>内存参数</strong></p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[mysqld]</span><br><span class="hljs-comment"># 缓冲池大小(物理内存的60-80%)</span><br><span class="hljs-attr">innodb_buffer_pool_size</span> = <span class="hljs-number">4</span>G<br><br><span class="hljs-comment"># 缓冲池实例数(每1G一个实例)</span><br><span class="hljs-attr">innodb_buffer_pool_instances</span> = <span class="hljs-number">4</span><br><br><span class="hljs-comment"># 日志缓冲区</span><br><span class="hljs-attr">innodb_log_buffer_size</span> = <span class="hljs-number">32</span>M<br><br><span class="hljs-comment"># 排序缓冲区</span><br><span class="hljs-attr">sort_buffer_size</span> = <span class="hljs-number">1</span>M<br><br><span class="hljs-comment"># 连接缓冲区</span><br><span class="hljs-attr">join_buffer_size</span> = <span class="hljs-number">1</span>M<br><br><span class="hljs-comment"># 读缓冲区</span><br><span class="hljs-attr">read_buffer_size</span> = <span class="hljs-number">1</span>M<br><span class="hljs-attr">read_rnd_buffer_size</span> = <span class="hljs-number">1</span>M<br></code></pre></td></tr></table></figure>
+
+<p><strong>连接参数</strong></p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[mysqld]</span><br><span class="hljs-comment"># 最大连接数</span><br><span class="hljs-attr">max_connections</span> = <span class="hljs-number">1000</span><br><br><span class="hljs-comment"># 最大错误连接数</span><br><span class="hljs-attr">max_connect_errors</span> = <span class="hljs-number">100</span><br><br><span class="hljs-comment"># 连接超时</span><br><span class="hljs-attr">connect_timeout</span> = <span class="hljs-number">10</span><br><br><span class="hljs-comment"># 等待超时</span><br><span class="hljs-attr">wait_timeout</span> = <span class="hljs-number">28800</span><br><span class="hljs-attr">interactive_timeout</span> = <span class="hljs-number">28800</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>InnoDB参数</strong></p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[mysqld]</span><br><span class="hljs-comment"># 日志文件大小</span><br><span class="hljs-attr">innodb_log_file_size</span> = <span class="hljs-number">512</span>M<br><br><span class="hljs-comment"># 日志文件组数</span><br><span class="hljs-attr">innodb_log_files_in_group</span> = <span class="hljs-number">3</span><br><br><span class="hljs-comment"># 刷新日志策略</span><br><span class="hljs-attr">innodb_flush_log_at_trx_commit</span> = <span class="hljs-number">1</span>  <span class="hljs-comment"># 0/1/2</span><br><br><span class="hljs-comment"># 刷新方法</span><br><span class="hljs-attr">innodb_flush_method</span> = O_DIRECT<br><br><span class="hljs-comment"># 并发线程数</span><br><span class="hljs-attr">innodb_thread_concurrency</span> = <span class="hljs-number">0</span>  <span class="hljs-comment"># 0表示无限制</span><br><br><span class="hljs-comment"># IO能力</span><br><span class="hljs-attr">innodb_io_capacity</span> = <span class="hljs-number">2000</span><br><span class="hljs-attr">innodb_io_capacity_max</span> = <span class="hljs-number">4000</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-监控指标"><a href="#6-2-监控指标" class="headerlink" title="6.2 监控指标"></a>6.2 监控指标</h3><p><strong>关键监控指标</strong></p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">┌─────────────────────────────────────────────────────────┐</span><br><span class="hljs-attribute">│                   监控指标                              │</span><br><span class="hljs-attribute">├─────────────────────────────────────────────────────────┤</span><br><span class="hljs-attribute">│  连接指标</span><span class="hljs-punctuation">:</span> <span class="hljs-string">                                             │</span><br><span class="hljs-attribute">│  - Threads_connected</span><span class="hljs-punctuation">:</span> <span class="hljs-string">当前连接数                       │</span><br><span class="hljs-attribute">│  - Threads_running</span><span class="hljs-punctuation">:</span> <span class="hljs-string">正在执行的线程数                   │</span><br><span class="hljs-attribute">│  - Aborted_connects</span><span class="hljs-punctuation">:</span> <span class="hljs-string">异常连接数                        │</span><br><span class="hljs-attribute">│                                                         │</span><br><span class="hljs-attribute">│  性能指标</span><span class="hljs-punctuation">:</span> <span class="hljs-string">                                             │</span><br><span class="hljs-attribute">│  - QPS</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Queries Per Second                             │</span><br><span class="hljs-attribute">│  - TPS</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Transactions Per Second                        │</span><br><span class="hljs-attribute">│  - Slow_queries</span><span class="hljs-punctuation">:</span> <span class="hljs-string">慢查询数量                            │</span><br><span class="hljs-attribute">│                                                         │</span><br><span class="hljs-attribute">│  缓存指标</span><span class="hljs-punctuation">:</span> <span class="hljs-string">                                             │</span><br><span class="hljs-attribute">│  - Innodb_buffer_pool_hit_rate</span><span class="hljs-punctuation">:</span> <span class="hljs-string">缓冲池命中率           │</span><br><span class="hljs-attribute">│  - Key_read_requests/Key_reads</span><span class="hljs-punctuation">:</span> <span class="hljs-string">MyISAM缓存命中率       │</span><br><span class="hljs-attribute">│                                                         │</span><br><span class="hljs-attribute">│  锁指标</span><span class="hljs-punctuation">:</span> <span class="hljs-string">                                               │</span><br><span class="hljs-attribute">│  - Innodb_row_lock_waits</span><span class="hljs-punctuation">:</span> <span class="hljs-string">行锁等待次数                 │</span><br><span class="hljs-attribute">│  - Innodb_row_lock_time</span><span class="hljs-punctuation">:</span> <span class="hljs-string">行锁等待总时间                │</span><br>│                                                         │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>监控SQL</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 查看连接数</span><br><span class="hljs-keyword">SHOW</span> STATUS <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;Threads%&#x27;</span>;<br><br><span class="hljs-comment">-- 查看缓冲池状态</span><br><span class="hljs-keyword">SHOW</span> STATUS <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;Innodb_buffer_pool%&#x27;</span>;<br><br><span class="hljs-comment">-- 计算缓冲池命中率</span><br><span class="hljs-keyword">SELECT</span> <br>    (<span class="hljs-number">1</span> <span class="hljs-operator">-</span> (Innodb_buffer_pool_reads <span class="hljs-operator">/</span> Innodb_buffer_pool_read_requests)) <span class="hljs-operator">*</span> <span class="hljs-number">100</span> <br>    <span class="hljs-keyword">AS</span> buffer_pool_hit_rate<br><span class="hljs-keyword">FROM</span> (<br>    <span class="hljs-keyword">SELECT</span> <br>        variable_value <span class="hljs-keyword">AS</span> Innodb_buffer_pool_reads<br>    <span class="hljs-keyword">FROM</span> performance_schema.global_status <br>    <span class="hljs-keyword">WHERE</span> variable_name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Innodb_buffer_pool_reads&#x27;</span><br>) r, (<br>    <span class="hljs-keyword">SELECT</span> <br>        variable_value <span class="hljs-keyword">AS</span> Innodb_buffer_pool_read_requests<br>    <span class="hljs-keyword">FROM</span> performance_schema.global_status <br>    <span class="hljs-keyword">WHERE</span> variable_name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Innodb_buffer_pool_read_requests&#x27;</span><br>) rr;<br><br><span class="hljs-comment">-- 查看锁等待</span><br><span class="hljs-keyword">SELECT</span> <br>    r.trx_id waiting_trx_id,<br>    r.trx_mysql_thread_id waiting_thread,<br>    b.trx_id blocking_trx_id,<br>    b.trx_mysql_thread_id blocking_thread<br><span class="hljs-keyword">FROM</span> information_schema.innodb_lock_waits w<br><span class="hljs-keyword">JOIN</span> information_schema.innodb_trx b <span class="hljs-keyword">ON</span> b.trx_id <span class="hljs-operator">=</span> w.blocking_trx_id<br><span class="hljs-keyword">JOIN</span> information_schema.innodb_trx r <span class="hljs-keyword">ON</span> r.trx_id <span class="hljs-operator">=</span> w.requesting_trx_id;<br></code></pre></td></tr></table></figure>
+
+<h3 id="6-3-性能测试"><a href="#6-3-性能测试" class="headerlink" title="6.3 性能测试"></a>6.3 性能测试</h3><p><strong>sysbench测试</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 安装</span><br>yum install sysbench<br><br><span class="hljs-comment"># 准备数据</span><br>sysbench oltp_read_write \<br>  --mysql-host=localhost \<br>  --mysql-port=3306 \<br>  --mysql-user=root \<br>  --mysql-password=password \<br>  --mysql-db=<span class="hljs-built_in">test</span> \<br>  --tables=10 \<br>  --table-size=100000 \<br>  prepare<br><br><span class="hljs-comment"># 执行测试</span><br>sysbench oltp_read_write \<br>  --mysql-host=localhost \<br>  --mysql-port=3306 \<br>  --mysql-user=root \<br>  --mysql-password=password \<br>  --mysql-db=<span class="hljs-built_in">test</span> \<br>  --tables=10 \<br>  --table-size=100000 \<br>  --threads=16 \<br>  --<span class="hljs-keyword">time</span>=300 \<br>  run<br><br><span class="hljs-comment"># 清理数据</span><br>sysbench oltp_read_write \<br>  --mysql-host=localhost \<br>  --mysql-port=3306 \<br>  --mysql-user=root \<br>  --mysql-password=password \<br>  --mysql-db=<span class="hljs-built_in">test</span> \<br>  --tables=10 \<br>  cleanup<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、最佳实践"><a href="#七、最佳实践" class="headerlink" title="七、最佳实践"></a>七、最佳实践</h2><h3 id="7-1-表设计规范"><a href="#7-1-表设计规范" class="headerlink" title="7.1 表设计规范"></a>7.1 表设计规范</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 1. 选择合适的数据类型</span><br><span class="hljs-comment">-- 整数: TINYINT &lt; SMALLINT &lt; MEDIUMINT &lt; INT &lt; BIGINT</span><br><span class="hljs-comment">-- 字符串: CHAR(定长) vs VARCHAR(变长)</span><br><span class="hljs-comment">-- 时间: DATETIME(8字节) vs TIMESTAMP(4字节)</span><br><br><span class="hljs-comment">-- 2. 适当反范式化</span><br><span class="hljs-comment">-- 冗余存储常用字段，减少JOIN</span><br><br><span class="hljs-comment">-- 3. 字段NOT NULL</span><br><span class="hljs-comment">-- NULL值影响索引效率</span><br><br><span class="hljs-comment">-- 4. 主键设计</span><br><span class="hljs-comment">-- 推荐自增ID或雪花算法生成的ID</span><br><br><span class="hljs-comment">-- 5. 字段注释</span><br><span class="hljs-keyword">CREATE TABLE</span> <span class="hljs-keyword">user</span> (<br>    id <span class="hljs-type">BIGINT</span> <span class="hljs-keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="hljs-string">&#x27;主键ID&#x27;</span>,<br>    name <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">50</span>) <span class="hljs-keyword">NOT NULL</span> COMMENT <span class="hljs-string">&#x27;用户名&#x27;</span>,<br>    create_time DATETIME <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="hljs-string">&#x27;创建时间&#x27;</span><br>) COMMENT<span class="hljs-operator">=</span><span class="hljs-string">&#x27;用户表&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-2-SQL编写规范"><a href="#7-2-SQL编写规范" class="headerlink" title="7.2 SQL编写规范"></a>7.2 SQL编写规范</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 1. 避免SELECT *</span><br><span class="hljs-keyword">SELECT</span> id, name <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> id <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;<br><br><span class="hljs-comment">-- 2. 避免大事务</span><br><span class="hljs-comment">-- 大事务拆分为小事务</span><br><br><span class="hljs-comment">-- 3. 批量操作</span><br><span class="hljs-keyword">INSERT INTO</span> <span class="hljs-keyword">user</span> (name, age) <span class="hljs-keyword">VALUES</span> <br>    (<span class="hljs-string">&#x27;张三&#x27;</span>, <span class="hljs-number">25</span>),<br>    (<span class="hljs-string">&#x27;李四&#x27;</span>, <span class="hljs-number">30</span>),<br>    (<span class="hljs-string">&#x27;王五&#x27;</span>, <span class="hljs-number">28</span>);<br><br><span class="hljs-comment">-- 4. 合理使用索引</span><br><span class="hljs-comment">-- 根据查询条件建索引</span><br><br><span class="hljs-comment">-- 5. 避免在WHERE中使用函数</span><br><span class="hljs-comment">-- WHERE create_time &gt;= &#x27;2024-01-01&#x27;</span><br><br><span class="hljs-comment">-- 6. 使用EXPLAIN分析</span><br>EXPLAIN <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">user</span> <span class="hljs-keyword">WHERE</span> name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;张三&#x27;</span>;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>MySQL性能优化要点：</p>
+<ol>
+<li>理解索引原理，合理设计索引</li>
+<li>掌握EXPLAIN，分析执行计划</li>
+<li>优化慢查询，减少全表扫描</li>
+<li>理解事务与锁，避免死锁</li>
+<li>合理设计架构，分库分表读写分离</li>
+<li>持续监控，建立性能基线</li>
+</ol>
+<hr>
+<blockquote>
+<p>💡 <strong>建议</strong>：性能优化是一个持续的过程，需要监控、分析、优化、验证的循环迭代。</p>
+</blockquote>
+<p><em>下一篇：Redis核心原理与实战应用</em></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/" class="print-no-link">#性能调优</a>
+      
+        <a href="/tags/MySQL/" class="print-no-link">#MySQL</a>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+        <a href="/tags/%E7%B4%A2%E5%BC%95%E4%BC%98%E5%8C%96/" class="print-no-link">#索引优化</a>
+      
+        <a href="/tags/%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" class="print-no-link">#查询优化</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MySQL性能优化实战-索引、查询优化与架构设计</div>
+      <div>https://1441754257.github.io/2024/04/15/MySQL性能优化实战-索引、查询优化与架构设计/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>贾一</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年4月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/08/Redis%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8/" title="Redis核心原理与实战应用">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis核心原理与实战应用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/12/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90-HashMap%E4%B8%8EConcurrentHashMap/" title="Java集合框架源码解析-HashMap与ConcurrentHashMap">
+                        <span class="hidden-mobile">Java集合框架源码解析-HashMap与ConcurrentHashMap</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

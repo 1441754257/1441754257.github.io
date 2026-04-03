@@ -1,0 +1,1160 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="贾一">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="JVM深入解析-内存模型、垃圾回收、类加载与性能调优 JVM是Java程序运行的核心引擎，深入理解JVM原理是成为高级Java工程师的必经之路。本文将系统讲解JVM内存模型、垃圾回收机制、类加载器原理及性能调优实战。  一、JVM整体架构1.1 JVM架构图1234567891011121314151617181920212223242526272829303132┌───────────────">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM深入解析-内存模型、垃圾回收、类加载与性能调优">
+<meta property="og:url" content="https://1441754257.github.io/2024/02/10/JVM%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E3%80%81%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E3%80%81%E7%B1%BB%E5%8A%A0%E8%BD%BD%E4%B8%8E%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/index.html">
+<meta property="og:site_name" content="贾一的技术博客">
+<meta property="og:description" content="JVM深入解析-内存模型、垃圾回收、类加载与性能调优 JVM是Java程序运行的核心引擎，深入理解JVM原理是成为高级Java工程师的必经之路。本文将系统讲解JVM内存模型、垃圾回收机制、类加载器原理及性能调优实战。  一、JVM整体架构1.1 JVM架构图1234567891011121314151617181920212223242526272829303132┌───────────────">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-02-10T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T02:42:08.851Z">
+<meta property="article:author" content="贾一">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="性能调优">
+<meta property="article:tag" content="内存模型">
+<meta property="article:tag" content="垃圾回收">
+<meta property="article:tag" content="类加载器">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>JVM深入解析-内存模型、垃圾回收、类加载与性能调优 - 贾一的技术博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1441754257.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>贾一的技术博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JVM深入解析-内存模型、垃圾回收、类加载与性能调优"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-02-10 09:00" pubdate>
+          2024年2月10日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          117 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JVM深入解析-内存模型、垃圾回收、类加载与性能调优</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="JVM深入解析-内存模型、垃圾回收、类加载与性能调优"><a href="#JVM深入解析-内存模型、垃圾回收、类加载与性能调优" class="headerlink" title="JVM深入解析-内存模型、垃圾回收、类加载与性能调优"></a>JVM深入解析-内存模型、垃圾回收、类加载与性能调优</h1><blockquote>
+<p>JVM是Java程序运行的核心引擎，深入理解JVM原理是成为高级Java工程师的必经之路。本文将系统讲解JVM内存模型、垃圾回收机制、类加载器原理及性能调优实战。</p>
+</blockquote>
+<h2 id="一、JVM整体架构"><a href="#一、JVM整体架构" class="headerlink" title="一、JVM整体架构"></a>一、JVM整体架构</h2><h3 id="1-1-JVM架构图"><a href="#1-1-JVM架构图" class="headerlink" title="1.1 JVM架构图"></a>1.1 JVM架构图</h3><figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs oxygene">┌─────────────────────────────────────────────────────────────────┐<br>│                           JVM架构                               │<br>├─────────────────────────────────────────────────────────────────┤<br>│  ┌──────────────────────────────────────────────────────────┐  │<br>│  │                    类加载器子系统                         │  │<br>│  │   加载 → 验证 → 准备 → 解析 → 初始化 → 使用 → 卸载        │  │<br>│  └──────────────────────────────────────────────────────────┘  │<br>├─────────────────────────────────────────────────────────────────┤<br>│  ┌──────────────────────────────────────────────────────────┐  │<br>│  │                   运行时数据区                            │  │<br>│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌─────────────┐  │  │<br>│  │  │程序计数器│ │ 虚拟机栈 │ │本地方法栈│ │    堆       │  │  │<br>│  │  │(线程私有)│ │(线程私有)│ │(线程私有)│ │ (线程共享)  │  │  │<br>│  │  └──────────┘ └──────────┘ └──────────┘ └─────────────┘  │  │<br>│  │                     ┌─────────────┐                       │  │<br>│  │                     │ 方法区/元空间│                       │  │<br>│  │                     │ (线程共享)  │                       │  │<br>│  │                     └─────────────┘                       │  │<br>│  └──────────────────────────────────────────────────────────┘  │<br>├─────────────────────────────────────────────────────────────────┤<br>│  ┌──────────────────────────────────────────────────────────┐  │<br>│  │                    执行引擎                               │  │<br>│  │   ┌─────────┐  ┌─────────┐  ┌─────────────────────┐      │  │<br>│  │   │解释器   │  │即时编译器│  │   垃圾收集器        │      │  │<br>│  │   └─────────┘  └─────────┘  └─────────────────────┘      │  │<br>│  └──────────────────────────────────────────────────────────┘  │<br>├─────────────────────────────────────────────────────────────────┤<br>│  ┌──────────────────────────────────────────────────────────┐  │<br>│  │                   本地库接口                              │  │<br>│  │                     JNI / Native <span class="hljs-keyword">Method</span>                  │  │<br>│  └──────────────────────────────────────────────────────────┘  │<br>└─────────────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、内存模型详解"><a href="#二、内存模型详解" class="headerlink" title="二、内存模型详解"></a>二、内存模型详解</h2><h3 id="2-1-程序计数器（Program-Counter）"><a href="#2-1-程序计数器（Program-Counter）" class="headerlink" title="2.1 程序计数器（Program Counter）"></a>2.1 程序计数器（Program Counter）</h3><p><strong>特点</strong></p>
+<ul>
+<li>线程私有，生命周期与线程相同</li>
+<li>记录当前线程执行的字节码指令位置</li>
+<li>唯一不会出现OutOfMemoryError的区域</li>
+</ul>
+<p><strong>作用</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 如果执行的是Java方法：记录正在执行的虚拟机字节码指令地址</span><br><span class="hljs-comment">// 如果执行的是Native方法：值为空(Undefined)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-2-虚拟机栈（Java-Virtual-Machine-Stack）"><a href="#2-2-虚拟机栈（Java-Virtual-Machine-Stack）" class="headerlink" title="2.2 虚拟机栈（Java Virtual Machine Stack）"></a>2.2 虚拟机栈（Java Virtual Machine Stack）</h3><p><strong>栈帧结构</strong></p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs scss">┌─────────────────────────────────┐<br>│           栈帧(Frame)           │<br>├─────────────────────────────────┤<br>│  ┌───────────────────────────┐  │<br>│  │     局部变量表             │  │<br>│  │  <span class="hljs-selector-attr">[0]</span><span class="hljs-selector-attr">[1]</span><span class="hljs-selector-attr">[2]</span><span class="hljs-selector-attr">[3]</span>...<span class="hljs-selector-attr">[n]</span>       │  │<br>│  └───────────────────────────┘  │<br>│  ┌───────────────────────────┐  │<br>│  │     操作数栈               │  │<br>│  │  ←  计算过程中的数据  →    │  │<br>│  └───────────────────────────┘  │<br>│  ┌───────────────────────────┐  │<br>│  │     动态链接               │  │<br>│  │  指向运行时常量池的方法引用 │  │<br>│  └───────────────────────────┘  │<br>│  ┌───────────────────────────┐  │<br>│  │     方法返回地址           │  │<br>│  │  方法退出后回到的位置      │  │<br>│  └───────────────────────────┘  │<br>└─────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>异常</strong></p>
+<ul>
+<li>StackOverflowError：栈深度超过限制（递归过深）</li>
+<li>OutOfMemoryError：无法分配新栈（创建过多线程）</li>
+</ul>
+<p><strong>示例</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StackOverflowDemo</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>    <br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">recursive</span><span class="hljs-params">()</span> &#123;<br>        count++;<br>        recursive();  <span class="hljs-comment">// 无限递归导致StackOverflowError</span><br>    &#125;<br>    <br>    <span class="hljs-comment">// VM Args: -Xss128k  设置栈大小</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-3-堆（Heap）"><a href="#2-3-堆（Heap）" class="headerlink" title="2.3 堆（Heap）"></a>2.3 堆（Heap）</h3><p><strong>堆内存结构</strong></p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs nix">┌─────────────────────────────────────────────────────────────┐<br>│                        堆内存                               │<br>├─────────────────────────────────────────────────────────────┤<br>│  ┌───────────────────────────────────┐  ┌───────────────┐  │<br>│  │           新生代(Young)           │  │   老年代(Old) │  │<br>│  │  ┌────────┬─────────┬────────┐   │  │               │  │<br>│  │  │  Eden  │    S0   │   S1   │   │  │               │  │<br>│  │  │  <span class="hljs-number">8</span><span class="hljs-symbol">/10</span>  │   <span class="hljs-number">1</span><span class="hljs-symbol">/10</span>  │  <span class="hljs-number">1</span><span class="hljs-symbol">/10</span>  │   │  │               │  │<br>│  │  └────────┴─────────┴────────┘   │  │               │  │<br>│  └───────────────────────────────────┘  └───────────────┘  │<br>└─────────────────────────────────────────────────────────────┘<br>  新生代:老年代 <span class="hljs-operator">=</span> <span class="hljs-number">1</span>:<span class="hljs-number">2</span>  (默认比例)<br>  Eden:Survivor <span class="hljs-operator">=</span> <span class="hljs-number">8</span>:<span class="hljs-number">1</span>:<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>对象分配流程</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs powershell">新对象创建<br>    │<br>    ▼<br>┌─────────┐<br>│ Eden区  │──────────────────┐<br>│ 是否放得下│                  │<br>└────┬────┘                  │<br>     │是                     │否<br>     ▼                       ▼<br>┌─────────┐           ┌─────────────┐<br>│ 直接分配 │           │ 大对象直接进│<br>└─────────┘           │   老年代    │<br>                      └─────────────┘<br>     │<br>     ▼ Eden满<br>┌─────────────┐<br>│ Minor <span class="hljs-built_in">GC</span>    │<br>│ 清理新生代   │<br>└──────┬──────┘<br>       │<br>       ▼ 存活对象<br>┌─────────────────┐<br>│ Survivor区      │<br>│ 年龄+<span class="hljs-number">1</span>，达到阈值│<br>│ (默认<span class="hljs-number">15</span>)进老年代│<br>└─────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>内存分配策略</strong></p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>对象优先在Eden分配</td>
+<td>大多数对象生命周期很短</td>
+</tr>
+<tr>
+<td>大对象直接进老年代</td>
+<td>超过阈值的大对象（-XX:PretenureSizeThreshold）</td>
+</tr>
+<tr>
+<td>长期存活对象进老年代</td>
+<td>年龄达到阈值（-XX:MaxTenuringThreshold）</td>
+</tr>
+<tr>
+<td>动态年龄判定</td>
+<td>Survivor区同年龄对象总和超过空间一半</td>
+</tr>
+</tbody></table>
+<h3 id="2-4-方法区（Method-Area）"><a href="#2-4-方法区（Method-Area）" class="headerlink" title="2.4 方法区（Method Area）"></a>2.4 方法区（Method Area）</h3><p><strong>演进历史</strong></p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm"><span class="hljs-keyword">JDK </span><span class="hljs-number">7</span>及之前：永久代(PermGen)  ──→  <span class="hljs-keyword">JVM内存的一部分</span><br><span class="hljs-keyword"></span>              │<br>              ▼<br><span class="hljs-keyword">JDK </span><span class="hljs-number">8</span>及之后：元空间(Metaspace) ──→  本地内存<br></code></pre></td></tr></table></figure>
+
+<p><strong>存储内容</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 1. 类型信息</span><br>- 类名、访问修饰符、父类、接口<br>- 字段信息、方法信息<br><br><span class="hljs-comment">// 2. 运行时常量池</span><br>- 字面量：字符串、<span class="hljs-keyword">final</span>常量<br>- 符号引用：类和接口的全限定名、字段和方法<br><br><span class="hljs-comment">// 3. 静态变量</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Example</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;  <span class="hljs-comment">// 存储在方法区</span><br>&#125;<br><br><span class="hljs-comment">// 4. 即时编译后的代码</span><br>- JIT编译器生成的本地代码<br></code></pre></td></tr></table></figure>
+
+<p><strong>元空间配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">-XX:MetaspaceSize=128m        <span class="hljs-comment"># 初始元空间大小</span><br>-XX:MaxMetaspaceSize=256m     <span class="hljs-comment"># 最大元空间大小</span><br>-XX:MinMetaspaceFreeRatio=40  <span class="hljs-comment"># GC后最小空闲比例</span><br>-XX:MaxMetaspaceFreeRatio=70  <span class="hljs-comment"># GC后最大空闲比例</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-5-对象内存布局"><a href="#2-5-对象内存布局" class="headerlink" title="2.5 对象内存布局"></a>2.5 对象内存布局</h3><p><strong>对象结构</strong></p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs scss">┌────────────────────────────────────────────────────┐<br>│                    对象结构                        │<br>├────────────────────────────────────────────────────┤<br>│  ┌──────────────────────────────────────────────┐ │<br>│  │              对象头(Object Header)           │ │<br>│  │  ┌─────────────────────────────────────────┐│ │<br>│  │  │ <span class="hljs-selector-tag">Mark</span> <span class="hljs-built_in">Word</span>(<span class="hljs-number">32</span>/<span class="hljs-number">64</span>位)                      ││ │<br>│  │  │ - 哈希码、GC年龄、锁状态标志等            ││ │<br>│  │  └─────────────────────────────────────────┘│ │<br>│  │  ┌─────────────────────────────────────────┐│ │<br>│  │  │ 类型指针(Class Pointer)                 ││ │<br>│  │  │ - 指向方法区的类元数据                   ││ │<br>│  │  └─────────────────────────────────────────┘│ │<br>│  │  ┌─────────────────────────────────────────┐│ │<br>│  │  │ 数组长度(仅数组对象)                     ││ │<br>│  │  └─────────────────────────────────────────┘│ │<br>│  └──────────────────────────────────────────────┘ │<br>│  ┌──────────────────────────────────────────────┐ │<br>│  │           实例数据(Instance Data)            │ │<br>│  │  - 父类继承的实例变量                        │ │<br>│  │  - 本类定义的实例变量                        │ │<br>│  └──────────────────────────────────────────────┘ │<br>│  ┌──────────────────────────────────────────────┐ │<br>│  │           对齐填充(Padding)                  │ │<br>│  │  - 保证对象大小是<span class="hljs-number">8</span>字节的整数倍               │ │<br>│  └──────────────────────────────────────────────┘ │<br>└────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>Mark Word结构（64位JVM）</strong></p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs coq">┌─────────────────────────────────────────────────────────────┐<br>│                      Mark Word (<span class="hljs-number">64</span>位)                       │<br>├─────────────────────┬───────────────────────────────────────┤<br>│     锁状态          │                内容                    │<br>├─────────────────────┼───────────────────────────────────────┤<br>│ 无锁(<span class="hljs-number">01</span>)            │ hashcode:<span class="hljs-number">31</span> | <span class="hljs-type">age</span>:<span class="hljs-number">4</span> | <span class="hljs-type">biased</span>:<span class="hljs-number">1</span> | <span class="hljs-type">01</span>   │<br>│ 偏向锁(<span class="hljs-number">01</span>)          │ thread:<span class="hljs-number">54</span> | <span class="hljs-type">epoch</span>:<span class="hljs-number">2</span> | <span class="hljs-type">age</span>:<span class="hljs-number">4</span> | <span class="hljs-type">1</span> | <span class="hljs-type">01</span>  │<br>│ 轻量锁(<span class="hljs-number">00</span>)          │ ptr_to_lock_record:<span class="hljs-number">62</span> | <span class="hljs-type">00</span>            │<br>│ 重量锁(<span class="hljs-number">10</span>)          │ ptr_to_heavyweight_monitor:<span class="hljs-number">62</span> | <span class="hljs-type">10</span>    │<br>│ GC标记(<span class="hljs-number">11</span>)          │ 空 | <span class="hljs-type">11</span>                                │<br>└─────────────────────┴───────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、垃圾回收机制"><a href="#三、垃圾回收机制" class="headerlink" title="三、垃圾回收机制"></a>三、垃圾回收机制</h2><h3 id="3-1-对象存活判定"><a href="#3-1-对象存活判定" class="headerlink" title="3.1 对象存活判定"></a>3.1 对象存活判定</h3><p><strong>引用计数法（已废弃）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 问题：无法解决循环引用</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ReferenceCountingGC</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">Object</span> <span class="hljs-variable">instance</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>&#125;<br><br><span class="hljs-type">ReferenceCountingGC</span> <span class="hljs-variable">objA</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReferenceCountingGC</span>();<br><span class="hljs-type">ReferenceCountingGC</span> <span class="hljs-variable">objB</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReferenceCountingGC</span>();<br>objA.instance = objB;<br>objB.instance = objA;  <span class="hljs-comment">// 循环引用，引用计数无法回收</span><br>objA = <span class="hljs-literal">null</span>;<br>objB = <span class="hljs-literal">null</span>;  <span class="hljs-comment">// 但可达性分析可以回收</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>可达性分析法（JVM采用）</strong></p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs mathematica">            <span class="hljs-variable">GC</span> <span class="hljs-built_in">Roots</span><br>                │<br>    ┌───────────┼───────────┐<br>    │           │           │<br>    ▼           ▼           ▼<br>┌───────┐   ┌───────┐   ┌───────┐<br>│ 对象<span class="hljs-variable">A</span> │───│ 对象<span class="hljs-variable">B</span> │───│ 对象<span class="hljs-built_in">C</span> │<br>└───────┘   └───────┘   └───────┘<br>    │                       │<br>    ▼                       ▼<br>┌───────┐               ┌───────┐<br>│ 对象<span class="hljs-built_in">D</span> │               │ 对象<span class="hljs-built_in">E</span> │  ← 不可达，将被回收<br>└───────┘               └───────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>GC Roots对象</strong></p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>虚拟机栈引用</td>
+<td>方法中的局部变量、参数</td>
+</tr>
+<tr>
+<td>方法区静态属性</td>
+<td>类的静态变量引用的对象</td>
+</tr>
+<tr>
+<td>方法区常量引用</td>
+<td>常量引用的对象</td>
+</tr>
+<tr>
+<td>本地方法栈引用</td>
+<td>JNI引用的对象</td>
+</tr>
+<tr>
+<td>同步锁持有对象</td>
+<td>synchronized锁定的对象</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-垃圾回收算法"><a href="#3-2-垃圾回收算法" class="headerlink" title="3.2 垃圾回收算法"></a>3.2 垃圾回收算法</h3><p><strong>标记-清除算法（Mark-Sweep）</strong></p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs less">标记前:<br>┌───┬───┬───┬───┬───┬───┬───┬───┐<br>│ <span class="hljs-selector-tag">A</span> │ <span class="hljs-selector-tag">B</span> │ <span class="hljs-selector-tag">C</span> │ <span class="hljs-selector-tag">D</span> │ <span class="hljs-selector-tag">E</span> │ <span class="hljs-selector-tag">F</span> │ <span class="hljs-selector-tag">G</span> │ <span class="hljs-selector-tag">H</span> │<br>└───┴───┴───┴───┴───┴───┴───┴───┘<br><br>标记后(红色为垃圾):<br>┌───┬───┬───┬───┬───┬───┬───┬───┐<br>│ <span class="hljs-selector-tag">A</span> │<span class="hljs-selector-attr">[B]</span>│ <span class="hljs-selector-tag">C</span> │<span class="hljs-selector-attr">[D]</span>│ <span class="hljs-selector-tag">E</span> │<span class="hljs-selector-attr">[F]</span>│ <span class="hljs-selector-tag">G</span> │<span class="hljs-selector-attr">[H]</span>│<br>└───┴───┴───┴───┴───┴───┴───┴───┘<br><br>清除后:<br>┌───┬───┬───┬───┬───┬───┬───┬───┐<br>│ <span class="hljs-selector-tag">A</span> │   │ <span class="hljs-selector-tag">C</span> │   │ <span class="hljs-selector-tag">E</span> │   │ <span class="hljs-selector-tag">G</span> │   │<br>└───┴───┴───┴───┴───┴───┴───┴───┘<br>        ↑       ↑       ↑<br>      碎片     碎片    碎片<br></code></pre></td></tr></table></figure>
+<ul>
+<li>优点：简单</li>
+<li>缺点：效率低、内存碎片</li>
+</ul>
+<p><strong>复制算法（Copying）</strong></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs stylus">复制前:<br>┌─────────────────────┬─────────────────────┐<br>│     Eden/<span class="hljs-built_in">S0</span>(使用中)  │      <span class="hljs-built_in">S1</span>(空闲)       │<br>│  ┌───┬───┬───┬───┐  │                     │<br>│  │ A │<span class="hljs-selector-attr">[B]</span>│ C │<span class="hljs-selector-attr">[D]</span>│  │                     │<br>│  └───┴───┴───┴───┘  │                     │<br>└─────────────────────┴─────────────────────┘<br><br>复制后:<br>┌─────────────────────┬─────────────────────┐<br>│    Eden/<span class="hljs-built_in">S0</span>(空闲)     │   <span class="hljs-built_in">S1</span>(使用中)        │<br>│                     │  ┌───┬───┐          │<br>│                     │  │ A │ C │          │<br>│                     │  └───┴───┘          │<br>└─────────────────────┴─────────────────────┘<br></code></pre></td></tr></table></figure>
+<ul>
+<li>优点：无碎片、效率高</li>
+<li>缺点：内存利用率低（需要预留一半空间）</li>
+<li>适用：新生代</li>
+</ul>
+<p><strong>标记-整理算法（Mark-Compact）</strong></p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs less">标记后:<br>┌───┬───┬───┬───┬───┬───┬───┬───┐<br>│ <span class="hljs-selector-tag">A</span> │<span class="hljs-selector-attr">[B]</span>│ <span class="hljs-selector-tag">C</span> │<span class="hljs-selector-attr">[D]</span>│ <span class="hljs-selector-tag">E</span> │<span class="hljs-selector-attr">[F]</span>│ <span class="hljs-selector-tag">G</span> │<span class="hljs-selector-attr">[H]</span>│<br>└───┴───┴───┴───┴───┴───┴───┴───┘<br><br>整理后:<br>┌───┬───┬───┬───┬───┬───┬───┬───┐<br>│ <span class="hljs-selector-tag">A</span> │ <span class="hljs-selector-tag">C</span> │ <span class="hljs-selector-tag">E</span> │ <span class="hljs-selector-tag">G</span> │   │   │   │   │<br>└───┴───┴───┴───┴───┴───┴───┴───┘<br>                      ↑<br>                   连续空闲空间<br></code></pre></td></tr></table></figure>
+<ul>
+<li>优点：无碎片</li>
+<li>缺点：需要移动对象，成本高</li>
+<li>适用：老年代</li>
+</ul>
+<h3 id="3-3-垃圾收集器"><a href="#3-3-垃圾收集器" class="headerlink" title="3.3 垃圾收集器"></a>3.3 垃圾收集器</h3><p><strong>收集器演进图</strong></p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">┌───────────────────────────────────────────────────────────┐<br>│                    垃圾收集器演进                          │<br>├───────────────────────────────────────────────────────────┤<br>│                                                           │<br>│  新生代收集器:                                            │<br>│  Serial ──→ ParNew ──→ Parallel <span class="hljs-keyword">Scavenge </span>                │<br>│                                                           │<br>│  老年代收集器:                                            │<br>│  Serial Old ──→ Parallel Old ──→ CMS(已废弃)             │<br>│                                                           │<br>│  全区域收集器:                                            │<br>│              ┌──→ G1 (<span class="hljs-keyword">JDK9默认) </span>                         │<br>│   CMS ───────┤                                           │<br>│              └──→ ZGC (<span class="hljs-keyword">JDK15正式版) </span>                     │<br>│                                                           │<br>│  低延迟收集器:                                            │<br>│  ZGC ──→ <span class="hljs-keyword">Shenandoah </span>                                     │<br>│                                                           │<br>└───────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>收集器对比</strong></p>
+<table>
+<thead>
+<tr>
+<th>收集器</th>
+<th>类型</th>
+<th>特点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Serial</td>
+<td>新生代</td>
+<td>单线程、简单</td>
+<td>客户端模式</td>
+</tr>
+<tr>
+<td>ParNew</td>
+<td>新生代</td>
+<td>Serial多线程版</td>
+<td>配合CMS</td>
+</tr>
+<tr>
+<td>Parallel Scavenge</td>
+<td>新生代</td>
+<td>吞吐量优先</td>
+<td>批处理任务</td>
+</tr>
+<tr>
+<td>CMS</td>
+<td>老年代</td>
+<td>并发收集、低停顿</td>
+<td>互联网应用（已废弃）</td>
+</tr>
+<tr>
+<td>G1</td>
+<td>全区域</td>
+<td>分区收集、可预测停顿</td>
+<td>大堆内存、低延迟</td>
+</tr>
+<tr>
+<td>ZGC</td>
+<td>全区域</td>
+<td>染色指针、&lt;10ms停顿</td>
+<td>超大堆内存</td>
+</tr>
+</tbody></table>
+<h3 id="3-4-G1收集器详解"><a href="#3-4-G1收集器详解" class="headerlink" title="3.4 G1收集器详解"></a>3.4 G1收集器详解</h3><p><strong>Region分区</strong></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs stylus">┌──────────────────────────────────────────────────────────┐<br>│                    G1堆内存分区                          │<br>├──────────────────────────────────────────────────────────┤<br>│  ┌────┐┌────┐┌────┐┌────┐┌────┐┌────┐┌────┐┌────┐     │<br>│  │<span class="hljs-selector-attr">[E]</span> ││<span class="hljs-selector-attr">[E]</span> ││<span class="hljs-selector-attr">[S]</span> ││<span class="hljs-selector-attr">[S]</span> ││<span class="hljs-selector-attr">[O]</span> ││<span class="hljs-selector-attr">[O]</span> ││<span class="hljs-selector-attr">[O]</span> ││<span class="hljs-selector-attr">[H]</span> │     │<br>│  └────┘└────┘└────┘└────┘└────┘└────┘└────┘└────┘     │<br>│  ┌────┐┌────┐┌────┐┌────┐┌────┐┌────┐┌────┐┌────┐     │<br>│  │<span class="hljs-selector-attr">[O]</span> ││<span class="hljs-selector-attr">[O]</span> ││<span class="hljs-selector-attr">[O]</span> ││<span class="hljs-selector-attr">[H]</span> ││    ││    ││    ││    │     │<br>│  └────┘└────┘└────┘└────┘└────┘└────┘└────┘└────┘     │<br>│                                                         │<br>│  E=Eden  S=Survivor  O=Old  H=<span class="hljs-built_in">Humongous</span>(大对象)        │<br>│  空白=<span class="hljs-built_in">Free</span>(空闲Region)                                  │<br>└──────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>G1工作流程</strong></p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs scss">┌─────────────┐     ┌─────────────┐     ┌─────────────┐<br>│  初始标记    │────→│   并发标记   │────→│  最终标记   │<br>│   (STW)     │     │             │     │   (STW)     │<br>└─────────────┘     └─────────────┘     └─────────────┘<br>                                               │<br>                                               ▼<br>                                        ┌─────────────┐<br>                                        │   筛选回收   │<br>                                        │   (STW)     │<br>                                        └─────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>G1参数配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">-XX:+UseG1GC                           <span class="hljs-comment"># 启用G1</span><br>-XX:MaxGCPauseMillis=200               <span class="hljs-comment"># 目标停顿时间</span><br>-XX:G1HeapRegionSize=16m               <span class="hljs-comment"># Region大小(1~32MB)</span><br>-XX:InitiatingHeapOccupancyPercent=45  <span class="hljs-comment"># 触发并发GC阈值</span><br>-XX:G1NewSizePercent=5                 <span class="hljs-comment"># 新生代最小比例</span><br>-XX:G1MaxNewSizePercent=60             <span class="hljs-comment"># 新生代最大比例</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-5-ZGC收集器"><a href="#3-5-ZGC收集器" class="headerlink" title="3.5 ZGC收集器"></a>3.5 ZGC收集器</h3><p><strong>ZGC特点</strong></p>
+<ul>
+<li>染色指针技术：在指针中存储标记信息</li>
+<li>读屏障：在读取引用时进行检查</li>
+<li>并发整理：在应用运行时整理内存</li>
+<li>停顿时间&lt;10ms，与堆大小无关</li>
+</ul>
+<p><strong>ZGC配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">-XX:+UseZGC                    <span class="hljs-comment"># 启用ZGC</span><br>-XX:ZCollectionInterval=5      <span class="hljs-comment"># 主动触发GC间隔(秒)</span><br>-XX:ZAllocationSpikeTolerance=2  <span class="hljs-comment"># 分配尖峰容忍度</span><br>-XX:+UnlockDiagnosticVMOptions  <span class="hljs-comment"># 解锁诊断选项</span><br>-XX:+ZProactive               <span class="hljs-comment"># 主动触发GC</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、类加载器"><a href="#四、类加载器" class="headerlink" title="四、类加载器"></a>四、类加载器</h2><h3 id="4-1-类加载过程"><a href="#4-1-类加载过程" class="headerlink" title="4.1 类加载过程"></a>4.1 类加载过程</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs">┌───────────────────────────────────────────────────────────┐<br>│                      类加载过程                           │<br>├───────────────────────────────────────────────────────────┤<br>│                                                           │<br>│   加载 → 验证 → 准备 → 解析 → 初始化 → 使用 → 卸载       │<br>│            └──────────┬──────────┘                       │<br>│                       │                                   │<br>│                    连接阶段                               │<br>│                                                           │<br>└───────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>各阶段详解</strong></p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>作用</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>加载</td>
+<td>读取.class文件，创建Class对象</td>
+<td>读取文件、网络、ZIP包</td>
+</tr>
+<tr>
+<td>验证</td>
+<td>确保字节码合法</td>
+<td>文件格式、语义验证</td>
+</tr>
+<tr>
+<td>准备</td>
+<td>为静态变量分配内存，设初始值</td>
+<td>static int a &#x3D; 123; → a &#x3D; 0</td>
+</tr>
+<tr>
+<td>解析</td>
+<td>符号引用转为直接引用</td>
+<td>接口、字段、方法解析</td>
+</tr>
+<tr>
+<td>初始化</td>
+<td>执行<clinit>方法，赋真实值</td>
+<td>a &#x3D; 123</td>
+</tr>
+</tbody></table>
+<h3 id="4-2-类加载器层次"><a href="#4-2-类加载器层次" class="headerlink" title="4.2 类加载器层次"></a>4.2 类加载器层次</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs awk">┌─────────────────────────────────────────────────────────┐<br>│                   类加载器层次                          │<br>├─────────────────────────────────────────────────────────┤<br>│  ┌─────────────────────────────────────────────────┐   │<br>│  │            Bootstrap ClassLoader                │   │<br>│  │              (启动类加载器)                      │   │<br>│  │          加载：<span class="hljs-variable">$JAVA_HOME</span><span class="hljs-regexp">/lib/</span>rt.jar            │   │<br>│  └──────────────────────┬──────────────────────────┘   │<br>│                         │                               │<br>│  ┌──────────────────────▼──────────────────────────┐   │<br>│  │           Extension ClassLoader                  │   │<br>│  │             (扩展类加载器)                       │   │<br>│  │      加载：<span class="hljs-variable">$JAVA_HOME</span><span class="hljs-regexp">/lib/</span>ext/*.jar             │   │<br>│  └──────────────────────┬──────────────────────────┘   │<br>│                         │                               │<br>│  ┌──────────────────────▼──────────────────────────┐   │<br>│  │           Application ClassLoader               │   │<br>│  │             (应用类加载器)                       │   │<br>│  │         加载：用户类路径(ClassPath)             │   │<br>│  └──────────────────────┬──────────────────────────┘   │<br>│                         │                               │<br>│  ┌──────────────────────▼──────────────────────────┐   │<br>│  │           Custom ClassLoader                    │   │<br>│  │             (自定义类加载器)                     │   │<br>│  │         加载：自定义路径                        │   │<br>│  └─────────────────────────────────────────────────┘   │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-双亲委派模型"><a href="#4-3-双亲委派模型" class="headerlink" title="4.3 双亲委派模型"></a>4.3 双亲委派模型</h3><p><strong>工作流程</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> Class&lt;?&gt; loadClass(String name, <span class="hljs-type">boolean</span> resolve) &#123;<br>    <span class="hljs-comment">// 1. 检查是否已加载</span><br>    Class&lt;?&gt; c = findLoadedClass(name);<br>    <span class="hljs-keyword">if</span> (c == <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">if</span> (parent != <span class="hljs-literal">null</span>) &#123;<br>                <span class="hljs-comment">// 2. 委派父加载器加载</span><br>                c = parent.loadClass(name, <span class="hljs-literal">false</span>);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-comment">// 3. 委派启动类加载器加载</span><br>                c = findBootstrapClassOrNull(name);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>            <span class="hljs-comment">// 父加载器无法加载</span><br>        &#125;<br>        <br>        <span class="hljs-keyword">if</span> (c == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-comment">// 4. 自己加载</span><br>            c = findClass(name);<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> c;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>双亲委派的好处</strong></p>
+<ol>
+<li>安全性：防止核心类被篡改</li>
+<li>唯一性：保证类只加载一次</li>
+<li>层次性：清晰的加载边界</li>
+</ol>
+<p><strong>破坏双亲委派</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 线程上下文类加载器</span><br>Thread.currentThread().getContextClassLoader();<br><br><span class="hljs-comment">// OSGi模块化</span><br><span class="hljs-comment">// 每个Bundle有自己的类加载器</span><br><br><span class="hljs-comment">// Tomcat WebApp类加载器</span><br><span class="hljs-comment">// 每个WebApp优先加载自己目录下的类</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-自定义类加载器"><a href="#4-4-自定义类加载器" class="headerlink" title="4.4 自定义类加载器"></a>4.4 自定义类加载器</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyClassLoader</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ClassLoader</span> &#123;<br>    <span class="hljs-keyword">private</span> String classPath;<br>    <br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">MyClassLoader</span><span class="hljs-params">(String classPath)</span> &#123;<br>        <span class="hljs-built_in">this</span>.classPath = classPath;<br>    &#125;<br>    <br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="hljs-keyword">throws</span> ClassNotFoundException &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">byte</span>[] data = loadByte(name);<br>            <span class="hljs-keyword">return</span> defineClass(name, data, <span class="hljs-number">0</span>, data.length);<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClassNotFoundException</span>(name);<br>        &#125;<br>    &#125;<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-type">byte</span>[] loadByte(String name) <span class="hljs-keyword">throws</span> IOException &#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">fileName</span> <span class="hljs-operator">=</span> classPath + <span class="hljs-string">&quot;/&quot;</span> + name.replace(<span class="hljs-string">&#x27;.&#x27;</span>, <span class="hljs-string">&#x27;/&#x27;</span>) + <span class="hljs-string">&quot;.class&quot;</span>;<br>        <span class="hljs-keyword">try</span> (<span class="hljs-type">InputStream</span> <span class="hljs-variable">is</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FileInputStream</span>(fileName);<br>             <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">baos</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>()) &#123;<br>            <span class="hljs-type">byte</span>[] buffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">byte</span>[<span class="hljs-number">1024</span>];<br>            <span class="hljs-type">int</span> len;<br>            <span class="hljs-keyword">while</span> ((len = is.read(buffer)) != -<span class="hljs-number">1</span>) &#123;<br>                baos.write(buffer, <span class="hljs-number">0</span>, len);<br>            &#125;<br>            <span class="hljs-keyword">return</span> baos.toByteArray();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、性能调优实战"><a href="#五、性能调优实战" class="headerlink" title="五、性能调优实战"></a>五、性能调优实战</h2><h3 id="5-1-常用JVM参数"><a href="#5-1-常用JVM参数" class="headerlink" title="5.1 常用JVM参数"></a>5.1 常用JVM参数</h3><p><strong>内存配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 堆内存</span><br>-Xms4g                      <span class="hljs-comment"># 初始堆大小</span><br>-Xmx4g                      <span class="hljs-comment"># 最大堆大小</span><br>-Xmn2g                      <span class="hljs-comment"># 新生代大小</span><br>-XX:NewRatio=2              <span class="hljs-comment"># 老年代:新生代 = 2:1</span><br>-XX:SurvivorRatio=8         <span class="hljs-comment"># Eden:S0:S1 = 8:1:1</span><br><br><span class="hljs-comment"># 元空间</span><br>-XX:MetaspaceSize=256m<br>-XX:MaxMetaspaceSize=512m<br><br><span class="hljs-comment"># 栈</span><br>-Xss512k                    <span class="hljs-comment"># 线程栈大小</span><br><br><span class="hljs-comment"># 直接内存</span><br>-XX:MaxDirectMemorySize=1g<br></code></pre></td></tr></table></figure>
+
+<p><strong>GC配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 选择GC收集器</span><br>-XX:+UseG1GC               <span class="hljs-comment"># G1</span><br>-XX:+UseZGC                <span class="hljs-comment"># ZGC</span><br>-XX:+UseParallelGC         <span class="hljs-comment"># Parallel</span><br><br><span class="hljs-comment"># G1调优</span><br>-XX:MaxGCPauseMillis=200<br>-XX:G1HeapRegionSize=16m<br>-XX:InitiatingHeapOccupancyPercent=45<br></code></pre></td></tr></table></figure>
+
+<p><strong>GC日志</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># JDK 11+</span><br>-Xlog:gc*,gc+heap,gc+metaspace:gc.log:<span class="hljs-keyword">time</span>,<span class="hljs-built_in">uptime</span>,level,tags<br><br><span class="hljs-comment"># JDK 8</span><br>-XX:+PrintGCDetails<br>-XX:+PrintGCDateStamps<br>-XX:+PrintGCTimeStamps<br>-Xloggc:gc.log<br>-XX:+PrintGCApplicationStoppedTime<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-性能分析工具"><a href="#5-2-性能分析工具" class="headerlink" title="5.2 性能分析工具"></a>5.2 性能分析工具</h3><p><strong>命令行工具</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># jps - 查看Java进程</span><br>jps -lvm<br><br><span class="hljs-comment"># jstat - GC统计</span><br>jstat -gc &lt;pid&gt; 1000 10   <span class="hljs-comment"># 每秒输出一次，共10次</span><br><br><span class="hljs-comment"># jinfo - 查看JVM参数</span><br>jinfo -flags &lt;pid&gt;<br>jinfo -flag MaxHeapSize &lt;pid&gt;<br><br><span class="hljs-comment"># jmap - 内存映射</span><br>jmap -histo &lt;pid&gt;          <span class="hljs-comment"># 对象统计</span><br>jmap -histo:live &lt;pid&gt;     <span class="hljs-comment"># 只统计存活对象(会触发GC)</span><br>jmap -dump:format=b,file=heap.hprof &lt;pid&gt;<br><br><span class="hljs-comment"># jstack - 线程转储</span><br>jstack -l &lt;pid&gt; &gt; thread.txt<br></code></pre></td></tr></table></figure>
+
+<p><strong>Arthas常用命令</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 安装启动</span><br>curl -O https://arthas.aliyun.com/arthas-boot.jar<br>java -jar arthas-boot.jar<br><br><span class="hljs-comment"># 常用命令</span><br>dashboard          <span class="hljs-comment"># 实时数据面板</span><br>thread             <span class="hljs-comment"># 线程信息</span><br>thread -n 5        <span class="hljs-comment"># CPU占用最高的5个线程</span><br>heapdump           <span class="hljs-comment"># 堆转储</span><br>classloader        <span class="hljs-comment"># 类加载器信息</span><br>jad                <span class="hljs-comment"># 反编译代码</span><br>watch              <span class="hljs-comment"># 方法调用监控</span><br>trace              <span class="hljs-comment"># 方法调用耗时</span><br>stack              <span class="hljs-comment"># 方法调用堆栈</span><br>profiler           <span class="hljs-comment"># 火焰图</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="5-3-调优案例"><a href="#5-3-调优案例" class="headerlink" title="5.3 调优案例"></a>5.3 调优案例</h3><p><strong>案例1：频繁Full GC</strong></p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs mathematica">问题现象<span class="hljs-operator">:</span><br><span class="hljs-operator">-</span> <span class="hljs-built_in">Full</span> <span class="hljs-variable">GC</span>每分钟触发多次<br><span class="hljs-operator">-</span> 应用响应时间长<br><span class="hljs-operator">-</span> 老年代使用率持续高位<br><br>分析<span class="hljs-operator">:</span><br><span class="hljs-punctuation">[</span><span class="hljs-built_in">Full</span> <span class="hljs-variable">GC</span> <span class="hljs-punctuation">(</span><span class="hljs-variable">Allocation</span> <span class="hljs-built_in">Failure</span><span class="hljs-punctuation">)</span> <br> <span class="hljs-punctuation">[</span><span class="hljs-variable">PSYoungGen</span><span class="hljs-operator">:</span> <span class="hljs-number">0</span><span class="hljs-built_in">K</span><span class="hljs-operator">-&gt;</span><span class="hljs-number">0</span><span class="hljs-built_in">K</span><span class="hljs-punctuation">(</span><span class="hljs-number">92160</span><span class="hljs-built_in">K</span><span class="hljs-punctuation">)</span><span class="hljs-punctuation">]</span> <br> <span class="hljs-punctuation">[</span><span class="hljs-variable">ParOldGen</span><span class="hljs-operator">:</span> <span class="hljs-number">819200</span><span class="hljs-built_in">K</span><span class="hljs-operator">-&gt;</span><span class="hljs-number">819200</span><span class="hljs-built_in">K</span><span class="hljs-punctuation">(</span><span class="hljs-number">819200</span><span class="hljs-built_in">K</span><span class="hljs-punctuation">)</span><span class="hljs-punctuation">]</span> <br> <span class="hljs-number">819200</span><span class="hljs-built_in">K</span><span class="hljs-operator">-&gt;</span><span class="hljs-number">819200</span><span class="hljs-built_in">K</span><span class="hljs-punctuation">(</span><span class="hljs-number">911360</span><span class="hljs-built_in">K</span><span class="hljs-punctuation">)</span><br><br>解决方案<span class="hljs-operator">:</span><br><span class="hljs-number">1.</span> 增大堆内存<span class="hljs-operator">:</span> <span class="hljs-operator">-</span><span class="hljs-variable">Xmx8g</span><br><span class="hljs-number">2.</span> 调整新生代比例<span class="hljs-operator">:</span> <span class="hljs-operator">-</span><span class="hljs-variable">XX</span><span class="hljs-operator">:</span><span class="hljs-variable">NewRatio</span><span class="hljs-operator">=</span><span class="hljs-number">1</span><br><span class="hljs-number">3.</span> 切换<span class="hljs-variable">G1</span>收集器<span class="hljs-operator">:</span> <span class="hljs-operator">-</span><span class="hljs-variable">XX</span><span class="hljs-operator">:+</span><span class="hljs-variable">UseG1GC</span><br><span class="hljs-number">4.</span> 优化代码减少对象创建<br></code></pre></td></tr></table></figure>
+
+<p><strong>案例2：内存溢出OOM</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 配置OOM时自动dump</span><br>-XX:+HeapDumpOnOutOfMemoryError<br>-XX:HeapDumpPath=/logs/heap.hprof<br><br><span class="hljs-comment"># 2. 使用MAT分析</span><br><span class="hljs-comment"># - 打开heap.hprof</span><br><span class="hljs-comment"># - 查看Dominator Tree</span><br><span class="hljs-comment"># - 找到占用最大的对象</span><br><span class="hljs-comment"># - 分析GC Roots引用链</span><br><br><span class="hljs-comment"># 3. 常见原因</span><br>- 静态集合持有对象引用<br>- 数据库连接未关闭<br>- ThreadLocal未清理<br>- 监听器未注销<br>- 大对象频繁创建<br></code></pre></td></tr></table></figure>
+
+<p><strong>案例3：CPU飙升</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 找到CPU占用高的进程</span><br>top<br><br><span class="hljs-comment"># 2. 找到该进程下CPU占用高的线程</span><br>top -H -p &lt;pid&gt;<br><br><span class="hljs-comment"># 3. 将线程ID转为16进制</span><br><span class="hljs-built_in">printf</span> <span class="hljs-string">&quot;%x&quot;</span> &lt;tid&gt;<br><br><span class="hljs-comment"># 4. 在线程转储中查找</span><br>jstack &lt;pid&gt; | grep &lt;hex_tid&gt; -A 30<br><br><span class="hljs-comment"># 5. 分析代码定位问题</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="5-4-最佳实践"><a href="#5-4-最佳实践" class="headerlink" title="5.4 最佳实践"></a>5.4 最佳实践</h3><p><strong>内存配置原则</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1. 堆内存设置</span><br>Xms = Xmx                    <span class="hljs-comment"># 避免动态扩容开销</span><br>堆大小 ≈ 系统内存的 50-70%   <span class="hljs-comment"># 留足操作系统内存</span><br><br><span class="hljs-comment"># 2. 新生代设置</span><br>高并发应用: 新生代占堆内存1/2<br>批量处理应用: 新生代占堆内存1/3<br><br><span class="hljs-comment"># 3. 元空间设置</span><br>根据类加载数量调整，一般256m-512m<br><br><span class="hljs-comment"># 4. 直接内存</span><br>Netty/NIO应用需要单独配置<br></code></pre></td></tr></table></figure>
+
+<p><strong>GC选择建议</strong></p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐收集器</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>客户端应用</td>
+<td>Serial</td>
+<td>-XX:+UseSerialGC</td>
+</tr>
+<tr>
+<td>批处理任务</td>
+<td>Parallel</td>
+<td>-XX:+UseParallelGC</td>
+</tr>
+<tr>
+<td>交互式应用(堆&lt;16G)</td>
+<td>G1</td>
+<td>-XX:+UseG1GC</td>
+</tr>
+<tr>
+<td>大堆内存(&gt;16G)</td>
+<td>ZGC</td>
+<td>-XX:+UseZGC</td>
+</tr>
+<tr>
+<td>超低延迟</td>
+<td>Shenandoah</td>
+<td>-XX:+UseShenandoahGC</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、总结"><a href="#六、总结" class="headerlink" title="六、总结"></a>六、总结</h2><h3 id="JVM调优要点"><a href="#JVM调优要点" class="headerlink" title="JVM调优要点"></a>JVM调优要点</h3><ol>
+<li><strong>理解内存模型</strong>：知道对象存在哪里，怎么回收</li>
+<li><strong>选择合适GC</strong>：根据业务场景选择收集器</li>
+<li><strong>监控先行</strong>：建立监控体系，有数据支撑</li>
+<li><strong>渐进调优</strong>：一次调一个参数，观察效果</li>
+<li><strong>代码优先</strong>：最好的调优是写好代码</li>
+</ol>
+<h3 id="学习路径"><a href="#学习路径" class="headerlink" title="学习路径"></a>学习路径</h3><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm"><span class="hljs-keyword">JVM入门 </span>→ 内存模型理解 → GC原理 → 调优实战 → 源码阅读<br></code></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p>💡 <strong>建议</strong>：在生产环境始终开启GC日志，定期分析，建立性能基线，及时发现和解决问题。</p>
+</blockquote>
+<p><em>参考资料：《深入理解Java虚拟机》、JVM官方文档</em></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java%E6%A0%B8%E5%BF%83%E5%9F%BA%E7%A1%80/" class="category-chain-item">Java核心基础</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java/" class="print-no-link">#Java</a>
+      
+        <a href="/tags/JVM/" class="print-no-link">#JVM</a>
+      
+        <a href="/tags/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/" class="print-no-link">#性能调优</a>
+      
+        <a href="/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="print-no-link">#内存模型</a>
+      
+        <a href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" class="print-no-link">#垃圾回收</a>
+      
+        <a href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/" class="print-no-link">#类加载器</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JVM深入解析-内存模型、垃圾回收、类加载与性能调优</div>
+      <div>https://1441754257.github.io/2024/02/10/JVM深入解析-内存模型、垃圾回收、类加载与性能调优/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>贾一</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年2月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/02/25/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97/" title="Java多线程与并发编程实战指南">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Java多线程与并发编程实战指南</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/01/28/Java%E6%A0%B8%E5%BF%83%E5%9F%BA%E7%A1%80-JVM%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90%E4%B8%8E%E8%B0%83%E4%BC%98%E5%AE%9E%E6%88%98/" title="Java核心基础-JVM深入解析与调优实战">
+                        <span class="hidden-mobile">Java核心基础-JVM深入解析与调优实战</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

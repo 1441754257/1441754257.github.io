@@ -1,0 +1,1038 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="贾一">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="分布式系统架构设计原理与实战 分布式系统是大规模互联网应用的基础架构。本文将系统讲解分布式系统核心理论、一致性协议、分布式锁、分布式事务等关键技术。  一、分布式系统核心理论1.1 CAP理论123456789101112131415161718192021222324┌─────────────────────────────────────────────────────────┐│">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式系统架构设计原理与实战">
+<meta property="og:url" content="https://1441754257.github.io/2024/11/08/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="贾一的技术博客">
+<meta property="og:description" content="分布式系统架构设计原理与实战 分布式系统是大规模互联网应用的基础架构。本文将系统讲解分布式系统核心理论、一致性协议、分布式锁、分布式事务等关键技术。  一、分布式系统核心理论1.1 CAP理论123456789101112131415161718192021222324┌─────────────────────────────────────────────────────────┐│">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-08T06:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-03T02:43:36.699Z">
+<meta property="article:author" content="贾一">
+<meta property="article:tag" content="分布式系统">
+<meta property="article:tag" content="架构设计">
+<meta property="article:tag" content="CAP理论">
+<meta property="article:tag" content="一致性">
+<meta property="article:tag" content="高可用">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>分布式系统架构设计原理与实战 - 贾一的技术博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1441754257.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>贾一的技术博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="分布式系统架构设计原理与实战"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-11-08 14:00" pubdate>
+          2024年11月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          73 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">分布式系统架构设计原理与实战</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="分布式系统架构设计原理与实战"><a href="#分布式系统架构设计原理与实战" class="headerlink" title="分布式系统架构设计原理与实战"></a>分布式系统架构设计原理与实战</h1><blockquote>
+<p>分布式系统是大规模互联网应用的基础架构。本文将系统讲解分布式系统核心理论、一致性协议、分布式锁、分布式事务等关键技术。</p>
+</blockquote>
+<h2 id="一、分布式系统核心理论"><a href="#一、分布式系统核心理论" class="headerlink" title="一、分布式系统核心理论"></a>一、分布式系统核心理论</h2><h3 id="1-1-CAP理论"><a href="#1-1-CAP理论" class="headerlink" title="1.1 CAP理论"></a>1.1 CAP理论</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs nix">┌─────────────────────────────────────────────────────────┐<br>│                      CAP理论                            │<br>├─────────────────────────────────────────────────────────┤<br>│                                                         │<br>│              Consistency (一致性)                       │<br>│                    <span class="hljs-operator">/</span>\                                   │<br>│                   <span class="hljs-symbol">/</span>  \                                  │<br>│                  <span class="hljs-symbol">/</span>    \                                 │<br>│                 <span class="hljs-symbol">/</span>      \                                │<br>│                <span class="hljs-symbol">/</span>   CA   \                               │<br>│               <span class="hljs-symbol">/</span>          \                              │<br>│              <span class="hljs-operator">/</span>____________\                             │<br>│             |            |                              │<br>│             |    CP     |                               │<br>│       AP    |          |                                │<br>│             |__________|                                │<br>│                                                         │<br>│  <span class="hljs-params">C:</span> 所有节点在同一时间看到相同的数据                     │<br>│  <span class="hljs-params">A:</span> 每个请求都能收到响应（成功或失败）                   │<br>│  <span class="hljs-params">P:</span> 网络分区时系统仍能继续运行                          │<br>│                                                         │<br>│  只能三选二：CA(传统RDBMS) <span class="hljs-symbol">/</span> CP(分布式DB) <span class="hljs-symbol">/</span> AP(NoSQL)   │<br>│                                                         │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<h3 id="1-2-BASE理论"><a href="#1-2-BASE理论" class="headerlink" title="1.2 BASE理论"></a>1.2 BASE理论</h3><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Basically Available</td>
+<td>基本可用，允许损失部分可用性</td>
+</tr>
+<tr>
+<td>Soft State</td>
+<td>软状态，允许数据存在中间状态</td>
+</tr>
+<tr>
+<td>Eventually Consistent</td>
+<td>最终一致性，经过一段时间后数据一致</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-分布式系统挑战"><a href="#1-3-分布式系统挑战" class="headerlink" title="1.3 分布式系统挑战"></a>1.3 分布式系统挑战</h3><ul>
+<li>网络延迟与分区</li>
+<li>节点故障</li>
+<li>数据一致性</li>
+<li>分布式事务</li>
+<li>全局时钟</li>
+</ul>
+<hr>
+<h2 id="二、一致性协议"><a href="#二、一致性协议" class="headerlink" title="二、一致性协议"></a>二、一致性协议</h2><h3 id="2-1-2PC（两阶段提交）"><a href="#2-1-2PC（两阶段提交）" class="headerlink" title="2.1 2PC（两阶段提交）"></a>2.1 2PC（两阶段提交）</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">┌─────────────────────────────────────────────────────────┐<br>│                   两阶段提交                            │<br>├─────────────────────────────────────────────────────────┤<br>│                                                         │<br>│  阶段一：准备阶段                                       │<br>│  ┌──────────┐      <span class="hljs-keyword">PREPARE</span>      ┌──────────┐          │<br>│  │ Coordinator│ ──────────────▶ │Participant│          │<br>│  └──────────┘                   └──────────┘          │<br>│                                      │                  │<br>│                              VOTE YES/<span class="hljs-keyword">NO</span>               │<br>│                                      ▼                  │<br>│  ┌──────────┐                   ┌──────────┐          │<br>│  │ Coordinator│ ◀────────────── │Participant│          │<br>│  └──────────┘                   └──────────┘          │<br>│                                                         │<br>│  阶段二：提交/回滚阶段                                  │<br>│  ┌──────────┐   <span class="hljs-keyword">COMMIT</span>/<span class="hljs-keyword">ROLLBACK</span>  ┌──────────┐        │<br>│  │ Coordinator│ ──────────────▶ │Participant│        │<br>│  └──────────┘                   └──────────┘        │<br>│                                                         │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>优缺点</strong></p>
+<ul>
+<li>优点：强一致性</li>
+<li>缺点：同步阻塞、单点故障、数据不一致风险</li>
+</ul>
+<h3 id="2-2-3PC（三阶段提交）"><a href="#2-2-3PC（三阶段提交）" class="headerlink" title="2.2 3PC（三阶段提交）"></a>2.2 3PC（三阶段提交）</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs">阶段一：CanCommit（询问是否可以提交）<br>阶段二：PreCommit（预提交）<br>阶段三：DoCommit（正式提交）<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-3-Paxos协议"><a href="#2-3-Paxos协议" class="headerlink" title="2.3 Paxos协议"></a>2.3 Paxos协议</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs markdown">角色：<br><span class="hljs-bullet">-</span> Proposer（提议者）：提出提案<br><span class="hljs-bullet">-</span> Acceptor（接受者）：对提案进行投票<br><span class="hljs-bullet">-</span> Learner（学习者）：获取达成共识的提案<br><br>流程：<br><span class="hljs-bullet">1.</span> Prepare阶段：Proposer发送Prepare请求<br><span class="hljs-bullet">2.</span> Promise阶段：Acceptor响应Promise<br><span class="hljs-bullet">3.</span> Accept阶段：Proposer发送Accept请求<br><span class="hljs-bullet">4.</span> Accepted阶段：Acceptor接受提案<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-4-Raft协议"><a href="#2-4-Raft协议" class="headerlink" title="2.4 Raft协议"></a>2.4 Raft协议</h3><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs sqf">┌─────────────────────────────────────────────────────────┐<br>│                    Raft协议                             │<br>├─────────────────────────────────────────────────────────┤<br>│                                                         │<br>│  角色：                                                 │<br>│  - <span class="hljs-built_in">Leader</span>：处理所有客户端请求                           │<br>│  - Follower：接收<span class="hljs-built_in">Leader</span>的消息                           │<br>│  - Candidate：选举过程中的候选人                        │<br>│                                                         │<br>│  选举过程：                                             │<br>│  <span class="hljs-number">1</span>. Follower超时转为Candidate                          │<br>│  <span class="hljs-number">2</span>. Candidate请求投票                                  │<br>│  <span class="hljs-number">3</span>. 获得多数票后成为<span class="hljs-built_in">Leader</span>                              │<br>│                                                         │<br>│  日志复制：                                             │<br>│  <span class="hljs-built_in">Leader</span> → <span class="hljs-built_in">Append</span> Entries → Followers                   │<br>│                                                         │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、分布式锁"><a href="#三、分布式锁" class="headerlink" title="三、分布式锁"></a>三、分布式锁</h2><h3 id="3-1-Redis分布式锁"><a href="#3-1-Redis分布式锁" class="headerlink" title="3.1 Redis分布式锁"></a>3.1 Redis分布式锁</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RedisLock</span> &#123;<br>    <br>    <span class="hljs-comment">// 加锁</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryLock</span><span class="hljs-params">(String key, String value, <span class="hljs-type">long</span> expireTime)</span> &#123;<br>        <span class="hljs-keyword">return</span> redis.setIfAbsent(key, value, expireTime, TimeUnit.SECONDS);<br>    &#125;<br>    <br>    <span class="hljs-comment">// 解锁（Lua脚本保证原子性）</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">unlock</span><span class="hljs-params">(String key, String value)</span> &#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">script</span> <span class="hljs-operator">=</span> <br>            <span class="hljs-string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) == ARGV[1] then &quot;</span> +<br>            <span class="hljs-string">&quot;    return redis.call(&#x27;del&#x27;, KEYS[1]) &quot;</span> +<br>            <span class="hljs-string">&quot;else return 0 end&quot;</span>;<br>        redis.execute(script, key, value);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// 使用Redisson（推荐）</span><br><span class="hljs-type">RLock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> redisson.getLock(<span class="hljs-string">&quot;myLock&quot;</span>);<br><span class="hljs-keyword">try</span> &#123;<br>    lock.lock(<span class="hljs-number">10</span>, TimeUnit.SECONDS);<br>    <span class="hljs-comment">// 业务逻辑</span><br>&#125; <span class="hljs-keyword">finally</span> &#123;<br>    lock.unlock();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-2-ZooKeeper分布式锁"><a href="#3-2-ZooKeeper分布式锁" class="headerlink" title="3.2 ZooKeeper分布式锁"></a>3.2 ZooKeeper分布式锁</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 基于临时顺序节点实现</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ZkDistributedLock</span> &#123;<br>    <br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">lock</span><span class="hljs-params">(String path)</span> &#123;<br>        <span class="hljs-comment">// 1. 创建临时顺序节点</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">node</span> <span class="hljs-operator">=</span> zk.create(path + <span class="hljs-string">&quot;/lock-&quot;</span>, <br>            EPHEMERAL_SEQUENTIAL);<br>        <br>        <span class="hljs-comment">// 2. 获取所有子节点，判断自己是否是最小节点</span><br>        List&lt;String&gt; children = zk.getChildren(path);<br>        <span class="hljs-keyword">if</span> (isMinNode(node, children)) &#123;<br>            <span class="hljs-keyword">return</span>;  <span class="hljs-comment">// 获取锁成功</span><br>        &#125;<br>        <br>        <span class="hljs-comment">// 3. 监听前一个节点</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">prevNode</span> <span class="hljs-operator">=</span> getPrevNode(node, children);<br>        zk.watch(prevNode, event -&gt; lock(path));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-3-分布式锁对比"><a href="#3-3-分布式锁对比" class="headerlink" title="3.3 分布式锁对比"></a>3.3 分布式锁对比</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>优点</th>
+<th>缺点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Redis</td>
+<td>性能高</td>
+<td>需要处理超时续期</td>
+<td>高并发、性能要求高</td>
+</tr>
+<tr>
+<td>ZooKeeper</td>
+<td>可靠性高</td>
+<td>性能较低</td>
+<td>一致性要求高</td>
+</tr>
+<tr>
+<td>etcd</td>
+<td>高可用、强一致</td>
+<td>复杂度较高</td>
+<td>Kubernetes生态</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="四、分布式事务"><a href="#四、分布式事务" class="headerlink" title="四、分布式事务"></a>四、分布式事务</h2><h3 id="4-1-TCC模式"><a href="#4-1-TCC模式" class="headerlink" title="4.1 TCC模式"></a>4.1 TCC模式</h3><figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs mathematica">┌─────────────────────────────────────────────────────────┐<br>│                      <span class="hljs-variable">TCC</span>模式                            │<br>├─────────────────────────────────────────────────────────┤<br>│                                                         │<br>│  <span class="hljs-variable">Try</span>：预留资源                                          │<br>│    ┌──────────────────────────────────────────────┐   │<br>│    │ 检查库存 → 冻结库存 → 创建预扣记录            │   │<br>│    └──────────────────────────────────────────────┘   │<br>│                                                         │<br>│  <span class="hljs-built_in">Confirm</span>：确认提交                                      │<br>│    ┌──────────────────────────────────────────────┐   │<br>│    │ 扣减冻结库存 → 删除预扣记录                   │   │<br>│    └──────────────────────────────────────────────┘   │<br>│                                                         │<br>│  <span class="hljs-built_in">Cancel</span>：回滚                                           │<br>│    ┌──────────────────────────────────────────────┐   │<br>│    │ 释放冻结库存 → 删除预扣记录                   │   │<br>│    └──────────────────────────────────────────────┘   │<br>│                                                         │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>代码示例</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StockService</span> &#123;<br>    <br>    <span class="hljs-meta">@Transactional</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">tryDeduct</span><span class="hljs-params">(String orderId, <span class="hljs-type">int</span> count)</span> &#123;<br>        <span class="hljs-comment">// 检查库存</span><br>        <span class="hljs-type">Stock</span> <span class="hljs-variable">stock</span> <span class="hljs-operator">=</span> stockMapper.selectForUpdate(productId);<br>        <span class="hljs-keyword">if</span> (stock.getCount() &lt; count) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BusinessException</span>(<span class="hljs-string">&quot;库存不足&quot;</span>);<br>        &#125;<br>        <span class="hljs-comment">// 冻结库存</span><br>        stockMapper.freeze(productId, count);<br>        <span class="hljs-comment">// 创建事务记录</span><br>        transactionMapper.insert(orderId, <span class="hljs-string">&quot;TRY&quot;</span>, count);<br>    &#125;<br>    <br>    <span class="hljs-meta">@Transactional</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">confirmDeduct</span><span class="hljs-params">(String orderId)</span> &#123;<br>        <span class="hljs-type">Transaction</span> <span class="hljs-variable">tx</span> <span class="hljs-operator">=</span> transactionMapper.select(orderId);<br>        <span class="hljs-comment">// 扣减冻结库存</span><br>        stockMapper.deductFrozen(productId, tx.getCount());<br>        <span class="hljs-comment">// 更新事务状态</span><br>        transactionMapper.updateStatus(orderId, <span class="hljs-string">&quot;CONFIRM&quot;</span>);<br>    &#125;<br>    <br>    <span class="hljs-meta">@Transactional</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">cancelDeduct</span><span class="hljs-params">(String orderId)</span> &#123;<br>        <span class="hljs-type">Transaction</span> <span class="hljs-variable">tx</span> <span class="hljs-operator">=</span> transactionMapper.select(orderId);<br>        <span class="hljs-comment">// 释放冻结库存</span><br>        stockMapper.unfreeze(productId, tx.getCount());<br>        <span class="hljs-comment">// 更新事务状态</span><br>        transactionMapper.updateStatus(orderId, <span class="hljs-string">&quot;CANCEL&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-Seata框架"><a href="#4-2-Seata框架" class="headerlink" title="4.2 Seata框架"></a>4.2 Seata框架</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// AT模式（推荐）</span><br><span class="hljs-meta">@GlobalTransactional</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">createOrder</span><span class="hljs-params">(OrderDTO orderDTO)</span> &#123;<br>    <span class="hljs-comment">// 1. 扣减库存</span><br>    stockClient.deduct(orderDTO.getProductId(), orderDTO.getQuantity());<br>    <span class="hljs-comment">// 2. 创建订单</span><br>    orderMapper.insert(order);<br>    <span class="hljs-comment">// 3. 扣减余额</span><br>    accountClient.deduct(orderDTO.getUserId(), orderDTO.getAmount());<br>&#125;<br><br><span class="hljs-comment">// Seata配置</span><br>seata:<br>  enabled: <span class="hljs-literal">true</span><br>  application-id: order-service<br>  tx-service-group: my_tx_group<br>  registry:<br>    type: nacos<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-本地消息表"><a href="#4-3-本地消息表" class="headerlink" title="4.3 本地消息表"></a>4.3 本地消息表</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">-- 本地消息表</span><br><span class="hljs-keyword">CREATE TABLE</span> transaction_message (<br>    id <span class="hljs-type">BIGINT</span> <span class="hljs-keyword">PRIMARY KEY</span>,<br>    message_id <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">64</span>) <span class="hljs-keyword">UNIQUE</span>,<br>    content <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">1024</span>),<br>    status TINYINT,  <span class="hljs-comment">-- 0:待发送 1:已发送 2:处理成功</span><br>    create_time DATETIME,<br>    INDEX idx_status (status)<br>);<br><br><span class="hljs-comment">-- 定时任务扫描并重试</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-事务消息（RocketMQ）"><a href="#4-4-事务消息（RocketMQ）" class="headerlink" title="4.4 事务消息（RocketMQ）"></a>4.4 事务消息（RocketMQ）</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 发送事务消息</span><br><span class="hljs-type">TransactionSendResult</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> producer.sendMessageInTransaction(<br>    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Message</span>(<span class="hljs-string">&quot;order_topic&quot;</span>, orderInfo),<br>    <span class="hljs-keyword">new</span> <span class="hljs-title class_">LocalTransactionExecuter</span>() &#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">public</span> LocalTransactionState <span class="hljs-title function_">executeLocalTransactionBranch</span><span class="hljs-params">(Message msg, Object arg)</span> &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-comment">// 执行本地事务</span><br>                orderService.createOrder(orderInfo);<br>                <span class="hljs-keyword">return</span> LocalTransactionState.COMMIT_MESSAGE;<br>            &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                <span class="hljs-keyword">return</span> LocalTransactionState.ROLLBACK_MESSAGE;<br>            &#125;<br>        &#125;<br>    &#125;,<br>    <span class="hljs-literal">null</span><br>);<br><br><span class="hljs-comment">// 事务回查</span><br>producer.setTransactionCheckListener((msg, checkResult) -&gt; &#123;<br>    <span class="hljs-comment">// 查询本地事务状态</span><br>    <span class="hljs-keyword">return</span> LocalTransactionState.COMMIT_MESSAGE;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、分布式ID生成"><a href="#五、分布式ID生成" class="headerlink" title="五、分布式ID生成"></a>五、分布式ID生成</h2><h3 id="5-1-雪花算法（Snowflake）"><a href="#5-1-雪花算法（Snowflake）" class="headerlink" title="5.1 雪花算法（Snowflake）"></a>5.1 雪花算法（Snowflake）</h3><figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs tap">┌─────────────────────────────────────────────────────────┐<br>│                  Snowflake ID结构                       │<br>├─────────────────────────────────────────────────────────┤<br>│                                                         │<br>│ <span class="hljs-number"> 0 </span>- 41位时间戳 - 10位机器ID - 12位序列号               │<br>│                                                         │<br>│  ┌──┬─────────────────────┬──────────┬────────────┐   │<br>│  │0 │  41位时间戳         │10位机器ID│ 12位序列号 │   │<br>│  └──┴─────────────────────┴──────────┴────────────┘   │<br>│                                                         │<br>│  时间戳：毫秒级，可使用69年                             │<br>│  机器ID：5位数据中心 + 5位工作机器                      │<br>│  序列号：毫秒内序号，支持每毫秒4096个ID                 │<br>│                                                         │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<p><strong>实现代码</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SnowflakeIdWorker</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">twepoch</span> <span class="hljs-operator">=</span> <span class="hljs-number">1288834974657L</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">workerIdBits</span> <span class="hljs-operator">=</span> <span class="hljs-number">5L</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">datacenterIdBits</span> <span class="hljs-operator">=</span> <span class="hljs-number">5L</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">sequenceBits</span> <span class="hljs-operator">=</span> <span class="hljs-number">12L</span>;<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-type">long</span> workerId;<br>    <span class="hljs-keyword">private</span> <span class="hljs-type">long</span> datacenterId;<br>    <span class="hljs-keyword">private</span> <span class="hljs-type">long</span> <span class="hljs-variable">sequence</span> <span class="hljs-operator">=</span> <span class="hljs-number">0L</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-type">long</span> <span class="hljs-variable">lastTimestamp</span> <span class="hljs-operator">=</span> -<span class="hljs-number">1L</span>;<br>    <br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-type">long</span> <span class="hljs-title function_">nextId</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-type">long</span> <span class="hljs-variable">timestamp</span> <span class="hljs-operator">=</span> System.currentTimeMillis();<br>        <br>        <span class="hljs-keyword">if</span> (timestamp &lt; lastTimestamp) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(<span class="hljs-string">&quot;时钟回拨&quot;</span>);<br>        &#125;<br>        <br>        <span class="hljs-keyword">if</span> (lastTimestamp == timestamp) &#123;<br>            sequence = (sequence + <span class="hljs-number">1</span>) &amp; sequenceMask;<br>            <span class="hljs-keyword">if</span> (sequence == <span class="hljs-number">0</span>) &#123;<br>                timestamp = tilNextMillis(lastTimestamp);<br>            &#125;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            sequence = <span class="hljs-number">0L</span>;<br>        &#125;<br>        <br>        lastTimestamp = timestamp;<br>        <br>        <span class="hljs-keyword">return</span> ((timestamp - twepoch) &lt;&lt; timestampLeftShift)<br>            | (datacenterId &lt;&lt; datacenterIdShift)<br>            | (workerId &lt;&lt; workerIdShift)<br>            | sequence;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-2-分布式ID方案对比"><a href="#5-2-分布式ID方案对比" class="headerlink" title="5.2 分布式ID方案对比"></a>5.2 分布式ID方案对比</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>UUID</td>
+<td>简单、本地生成</td>
+<td>无序、太长</td>
+</tr>
+<tr>
+<td>数据库自增</td>
+<td>简单、有序</td>
+<td>单点、性能瓶颈</td>
+</tr>
+<tr>
+<td>Redis INCR</td>
+<td>高性能</td>
+<td>依赖Redis</td>
+</tr>
+<tr>
+<td>Snowflake</td>
+<td>高性能、有序</td>
+<td>时钟回拨问题</td>
+</tr>
+<tr>
+<td>Leaf号段模式</td>
+<td>高性能</td>
+<td>需要数据库</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、分布式缓存"><a href="#六、分布式缓存" class="headerlink" title="六、分布式缓存"></a>六、分布式缓存</h2><h3 id="6-1-缓存架构"><a href="#6-1-缓存架构" class="headerlink" title="6.1 缓存架构"></a>6.1 缓存架构</h3><figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs lasso">┌─────────────────────────────────────────────────────────┐<br>│                   多级缓存架构                          │<br>├─────────────────────────────────────────────────────────┤<br>│                                                         │<br>│  ┌─────────────────────────────────────────────────┐   │<br>│  │              应用层（本地缓存）                  │   │<br>│  │            Caffeine / Guava <span class="hljs-keyword">Cache</span>               │   │<br>│  └─────────────────────────────────────────────────┘   │<br>│                          │                              │<br>│                          ▼                              │<br>│  ┌─────────────────────────────────────────────────┐   │<br>│  │              分布式缓存层                        │   │<br>│  │              Redis Cluster                      │   │<br>│  └─────────────────────────────────────────────────┘   │<br>│                          │                              │<br>│                          ▼                              │<br>│  ┌─────────────────────────────────────────────────┐   │<br>│  │              数据库层                            │   │<br>│  │              MySQL主从                          │   │<br>│  └─────────────────────────────────────────────────┘   │<br>│                                                         │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-缓存问题与解决方案"><a href="#6-2-缓存问题与解决方案" class="headerlink" title="6.2 缓存问题与解决方案"></a>6.2 缓存问题与解决方案</h3><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>说明</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>缓存穿透</td>
+<td>查询不存在的数据</td>
+<td>布隆过滤器、缓存空值</td>
+</tr>
+<tr>
+<td>缓存击穿</td>
+<td>热点key过期</td>
+<td>互斥锁、永不过期</td>
+</tr>
+<tr>
+<td>缓存雪崩</td>
+<td>大量key同时过期</td>
+<td>随机过期时间、多级缓存</td>
+</tr>
+<tr>
+<td>缓存预热</td>
+<td>系统启动缓存为空</td>
+<td>系统启动时预加载</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、服务治理"><a href="#七、服务治理" class="headerlink" title="七、服务治理"></a>七、服务治理</h2><h3 id="7-1-服务注册与发现"><a href="#7-1-服务注册与发现" class="headerlink" title="7.1 服务注册与发现"></a>7.1 服务注册与发现</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-comment"># Nacos配置</span><br><span class="hljs-attr">spring:</span><br>  <span class="hljs-attr">cloud:</span><br>    <span class="hljs-attr">nacos:</span><br>      <span class="hljs-attr">discovery:</span><br>        <span class="hljs-attr">server-addr:</span> <span class="hljs-string">localhost:8848</span><br>        <span class="hljs-attr">namespace:</span> <span class="hljs-string">prod</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="7-2-负载均衡策略"><a href="#7-2-负载均衡策略" class="headerlink" title="7.2 负载均衡策略"></a>7.2 负载均衡策略</h3><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>轮询</td>
+<td>依次访问</td>
+</tr>
+<tr>
+<td>随机</td>
+<td>随机选择</td>
+</tr>
+<tr>
+<td>加权轮询</td>
+<td>根据权重分配</td>
+</tr>
+<tr>
+<td>最小连接</td>
+<td>选择连接数最少的服务器</td>
+</tr>
+<tr>
+<td>一致性哈希</td>
+<td>相同请求路由到同一节点</td>
+</tr>
+</tbody></table>
+<h3 id="7-3-熔断降级"><a href="#7-3-熔断降级" class="headerlink" title="7.3 熔断降级"></a>7.3 熔断降级</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Sentinel熔断</span><br><span class="hljs-meta">@SentinelResource(value = &quot;getUser&quot;, </span><br><span class="hljs-meta">    blockHandler = &quot;handleBlock&quot;,</span><br><span class="hljs-meta">    fallback = &quot;handleFallback&quot;)</span><br><span class="hljs-keyword">public</span> User <span class="hljs-title function_">getUser</span><span class="hljs-params">(Long id)</span> &#123;<br>    <span class="hljs-keyword">return</span> userClient.getUser(id);<br>&#125;<br><br><span class="hljs-keyword">public</span> User <span class="hljs-title function_">handleBlock</span><span class="hljs-params">(Long id, BlockException ex)</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(-<span class="hljs-number">1L</span>, <span class="hljs-string">&quot;系统繁忙&quot;</span>);<br>&#125;<br><br><span class="hljs-keyword">public</span> User <span class="hljs-title function_">handleFallback</span><span class="hljs-params">(Long id, Throwable ex)</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(-<span class="hljs-number">1L</span>, <span class="hljs-string">&quot;服务降级&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>分布式系统设计要点：</p>
+<ol>
+<li>理解CAP理论，做出合理取舍</li>
+<li>选择合适的一致性协议</li>
+<li>分布式锁保证资源互斥</li>
+<li>分布式事务保证数据一致</li>
+<li>合理设计分布式ID方案</li>
+</ol>
+<hr>
+<blockquote>
+<p>💡 <strong>建议</strong>：分布式系统复杂度高，需要权衡一致性、可用性和性能。</p>
+</blockquote>
+<p><em>参考资料：《分布式系统原理》、《数据密集型应用系统设计》</em></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" class="category-chain-item">架构设计</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/" class="print-no-link">#分布式系统</a>
+      
+        <a href="/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" class="print-no-link">#架构设计</a>
+      
+        <a href="/tags/CAP%E7%90%86%E8%AE%BA/" class="print-no-link">#CAP理论</a>
+      
+        <a href="/tags/%E4%B8%80%E8%87%B4%E6%80%A7/" class="print-no-link">#一致性</a>
+      
+        <a href="/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/" class="print-no-link">#高可用</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>分布式系统架构设计原理与实战</div>
+      <div>https://1441754257.github.io/2024/11/08/分布式系统架构设计原理与实战/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>贾一</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年11月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/01/15/Docker%E4%B8%8EKubernetes%E4%BA%91%E5%8E%9F%E7%94%9F%E5%AE%9E%E6%88%98/" title="Docker与Kubernetes云原生实战">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Docker与Kubernetes云原生实战</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/12/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98-RocketMQ%E4%B8%8EKafka/" title="消息队列核心原理与实战-RocketMQ与Kafka">
+                        <span class="hidden-mobile">消息队列核心原理与实战-RocketMQ与Kafka</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
