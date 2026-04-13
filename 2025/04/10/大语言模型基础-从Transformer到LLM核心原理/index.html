@@ -1,0 +1,1225 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="贾一">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本文系统梳理大语言模型的核心原理，从 N-gram 统计模型到 Transformer 架构，再到提示工程与模型局限性，帮助开发者建立完整的 LLM 知识体系。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大语言模型基础-从Transformer到LLM核心原理">
+<meta property="og:url" content="https://1441754257.github.io/2025/04/10/%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80-%E4%BB%8ETransformer%E5%88%B0LLM%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="贾一的技术博客">
+<meta property="og:description" content="本文系统梳理大语言模型的核心原理，从 N-gram 统计模型到 Transformer 架构，再到提示工程与模型局限性，帮助开发者建立完整的 LLM 知识体系。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-04-10T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-13T03:28:14.011Z">
+<meta property="article:author" content="贾一">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="大模型">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="NLP">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>大语言模型基础-从Transformer到LLM核心原理 - 贾一的技术博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1441754257.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>贾一的技术博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="大语言模型基础-从Transformer到LLM核心原理"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-04-10 09:00" pubdate>
+          2025年4月10日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          51 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">大语言模型基础-从Transformer到LLM核心原理</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>本文系统梳理大语言模型的核心原理，从 N-gram 统计模型到 Transformer 架构，再到提示工程与模型局限性，帮助开发者建立完整的 LLM 知识体系。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="一、语言模型演进历史"><a href="#一、语言模型演进历史" class="headerlink" title="一、语言模型演进历史"></a>一、语言模型演进历史</h2><h3 id="1-1-统计语言模型：N-gram"><a href="#1-1-统计语言模型：N-gram" class="headerlink" title="1.1 统计语言模型：N-gram"></a>1.1 统计语言模型：N-gram</h3><p><strong>语言模型（Language Model）</strong> 的根本任务是计算一个词序列出现的概率。</p>
+<p><strong>N-gram 模型</strong>基于<strong>马尔可夫假设</strong>：一个词的出现概率只与它前面有限的 n-1 个词有关。</p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs coq">P(wᵢ | <span class="hljs-type">w</span>₁,...,wᵢ₋₁) ≈ P(wᵢ | <span class="hljs-type">w</span>ᵢ₋ₙ₊₁,...,wᵢ₋₁)<br></code></pre></td></tr></table></figure>
+
+<p><strong>Bigram（N&#x3D;2）示例计算：</strong></p>
+<p>语料库：<code>datawhale agent learns</code> &#x2F; <code>datawhale agent works</code></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">P</span>(agent | datawhale) = Count(datawhale agent) / Count(datawhale) = <span class="hljs-number">2</span>/<span class="hljs-number">2</span> = <span class="hljs-number">1</span>.<span class="hljs-number">0</span><br><span class="hljs-attribute">P</span>(learns | agent)    = Count(agent learns) / Count(agent)        = <span class="hljs-number">1</span>/<span class="hljs-number">2</span> = <span class="hljs-number">0</span>.<span class="hljs-number">5</span><br><span class="hljs-attribute">P</span>(句子) ≈ <span class="hljs-number">0</span>.<span class="hljs-number">333</span> × <span class="hljs-number">1</span>.<span class="hljs-number">0</span> × <span class="hljs-number">0</span>.<span class="hljs-number">5</span> ≈ <span class="hljs-number">0</span>.<span class="hljs-number">167</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>N-gram 的致命缺陷：</strong></p>
+<ul>
+<li><strong>数据稀疏性</strong>：未见过的词序列概率为 0</li>
+<li><strong>泛化能力差</strong>：无法理解词语间的语义相似性（<code>agent</code> 和 <code>robot</code> 被视为完全不同的词）</li>
+</ul>
+<hr>
+<h3 id="1-2-神经网络语言模型与词嵌入"><a href="#1-2-神经网络语言模型与词嵌入" class="headerlink" title="1.2 神经网络语言模型与词嵌入"></a>1.2 神经网络语言模型与词嵌入</h3><p>2003 年 Bengio 提出<strong>前馈神经网络语言模型</strong>，核心思想：</p>
+<ol>
+<li><strong>词嵌入（Word Embedding）</strong>：将词映射为高维连续向量，语义相近的词在向量空间中距离更近</li>
+<li><strong>余弦相似度</strong>衡量词语关系：</li>
+</ol>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs lisp">similarity(<span class="hljs-name">a</span>, b) = cos(θ) = (<span class="hljs-name">a</span>·b) / (<span class="hljs-name">|a|</span>·|b|)<br></code></pre></td></tr></table></figure>
+
+<p><strong>经典类比关系：</strong></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">vector</span><span class="hljs-params">(<span class="hljs-string">&#x27;King&#x27;</span>)</span></span> - <span class="hljs-built_in">vector</span>(<span class="hljs-string">&#x27;Man&#x27;</span>) + <span class="hljs-built_in">vector</span>(<span class="hljs-string">&#x27;Woman&#x27;</span>) ≈ <span class="hljs-built_in">vector</span>(<span class="hljs-string">&#x27;Queen&#x27;</span>)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-3-RNN-与-LSTM"><a href="#1-3-RNN-与-LSTM" class="headerlink" title="1.3 RNN 与 LSTM"></a>1.3 RNN 与 LSTM</h3><p><strong>循环神经网络（RNN）</strong> 引入<strong>隐藏状态</strong>作为记忆，解决了固定窗口限制。</p>
+<p>但 RNN 存在<strong>长期依赖问题</strong>：</p>
+<ul>
+<li><strong>梯度消失</strong>：长序列中早期信息无法有效传递</li>
+<li><strong>梯度爆炸</strong>：梯度值变得极大</li>
+</ul>
+<p><strong>LSTM（长短时记忆网络）</strong> 通过<strong>门控机制</strong>解决此问题：</p>
+<ul>
+<li><strong>遗忘门</strong>：决定丢弃哪些历史信息</li>
+<li><strong>输入门</strong>：决定存入哪些新信息</li>
+<li><strong>输出门</strong>：决定输出哪些信息</li>
+</ul>
+<hr>
+<h2 id="二、Transformer-架构详解"><a href="#二、Transformer-架构详解" class="headerlink" title="二、Transformer 架构详解"></a>二、Transformer 架构详解</h2><p>2017 年 Google 提出 Transformer，<strong>完全抛弃循环结构</strong>，依赖<strong>注意力机制</strong>实现并行计算。</p>
+<h3 id="2-1-Encoder-Decoder-整体结构"><a href="#2-1-Encoder-Decoder-整体结构" class="headerlink" title="2.1 Encoder-Decoder 整体结构"></a>2.1 Encoder-Decoder 整体结构</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">输入序列 → <span class="hljs-selector-attr">[编码器 Encoder]</span> → 上下文向量 → <span class="hljs-selector-attr">[解码器 Decoder]</span> → 输出序列<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>编码器</strong>：理解输入，为每个词元生成富含上下文信息的向量</li>
+<li><strong>解码器</strong>：参考编码器输出，逐词生成目标序列</li>
+</ul>
+<hr>
+<h3 id="2-2-自注意力机制（Self-Attention）"><a href="#2-2-自注意力机制（Self-Attention）" class="headerlink" title="2.2 自注意力机制（Self-Attention）"></a>2.2 自注意力机制（Self-Attention）</h3><p><strong>核心思想</strong>：处理每个词时，动态关注句子中所有其他词，分配不同的注意力权重。</p>
+<p><strong>三个角色：</strong></p>
+<ul>
+<li><strong>Query（Q）</strong>：当前词，主动查询其他词</li>
+<li><strong>Key（K）</strong>：被查询词的”标签”</li>
+<li><strong>Value（V）</strong>：词本身携带的”内容”</li>
+</ul>
+<p><strong>计算公式：</strong></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">Attention</span><span class="hljs-params">(Q, K, V)</span></span> = <span class="hljs-built_in">softmax</span>(QKᵀ / √dₖ) · V<br></code></pre></td></tr></table></figure>
+
+<p><strong>计算步骤：</strong></p>
+<ol>
+<li>生成 Q、K、V 向量（原始词向量 × 权重矩阵）</li>
+<li>计算相关性得分：Q 与所有 K 做点积</li>
+<li>除以 √dₖ 缩放，防止梯度过小</li>
+<li>Softmax 归一化得到注意力权重</li>
+<li>加权求和 V 向量，得到新的词表示</li>
+</ol>
+<hr>
+<h3 id="2-3-多头注意力（Multi-Head-Attention）"><a href="#2-3-多头注意力（Multi-Head-Attention）" class="headerlink" title="2.3 多头注意力（Multi-Head Attention）"></a>2.3 多头注意力（Multi-Head Attention）</h3><p><strong>思想</strong>：让多个”专家”从不同角度审视句子，捕捉不同类型的关系（指代、时态、从属等）。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">MultiHeadAttention</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, d_model, num_heads</span>):<br>        <span class="hljs-variable language_">self</span>.d_k = d_model // num_heads<br>        <span class="hljs-variable language_">self</span>.W_q = nn.Linear(d_model, d_model)<br>        <span class="hljs-variable language_">self</span>.W_k = nn.Linear(d_model, d_model)<br>        <span class="hljs-variable language_">self</span>.W_v = nn.Linear(d_model, d_model)<br>        <span class="hljs-variable language_">self</span>.W_o = nn.Linear(d_model, d_model)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">scaled_dot_product_attention</span>(<span class="hljs-params">self, Q, K, V, mask=<span class="hljs-literal">None</span></span>):<br>        attn_scores = torch.matmul(Q, K.transpose(-<span class="hljs-number">2</span>, -<span class="hljs-number">1</span>)) / math.sqrt(<span class="hljs-variable language_">self</span>.d_k)<br>        <span class="hljs-keyword">if</span> mask <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            attn_scores = attn_scores.masked_fill(mask == <span class="hljs-number">0</span>, -<span class="hljs-number">1e9</span>)<br>        attn_probs = torch.softmax(attn_scores, dim=-<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">return</span> torch.matmul(attn_probs, V)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-4-前馈神经网络（FFN）"><a href="#2-4-前馈神经网络（FFN）" class="headerlink" title="2.4 前馈神经网络（FFN）"></a>2.4 前馈神经网络（FFN）</h3><p>每个 Encoder&#x2F;Decoder 层中，注意力层之后跟着<strong>逐位置前馈网络</strong>：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">FFN</span><span class="hljs-params">(x)</span></span> = <span class="hljs-built_in">max</span>(<span class="hljs-number">0</span>, xW₁ + b₁)W₂ + b₂<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>“先扩大再缩小”：<code>d_ff = 4 × d_model</code>，学习更丰富的特征</li>
+<li><strong>逐位置</strong>：对每个词元独立处理，所有位置共享权重</li>
+</ul>
+<hr>
+<h3 id="2-5-残差连接与层归一化"><a href="#2-5-残差连接与层归一化" class="headerlink" title="2.5 残差连接与层归一化"></a>2.5 残差连接与层归一化</h3><p>每个子模块都被 <code>Add &amp; Norm</code> 包裹：</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs isbl"><span class="hljs-variable">Output</span> = <span class="hljs-function"><span class="hljs-title">LayerNorm</span>(<span class="hljs-variable">x</span> + <span class="hljs-title">Sublayer</span>(<span class="hljs-variable">x</span>))</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>残差连接（Add）</strong>：解决梯度消失，梯度可绕过子模块直接传播</li>
+<li><strong>层归一化（Norm）</strong>：稳定训练，加速收敛</li>
+</ul>
+<hr>
+<h3 id="2-6-位置编码（Positional-Encoding）"><a href="#2-6-位置编码（Positional-Encoding）" class="headerlink" title="2.6 位置编码（Positional Encoding）"></a>2.6 位置编码（Positional Encoding）</h3><p>自注意力本身不包含位置信息，需要额外注入：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">PE</span><span class="hljs-params">(pos, <span class="hljs-number">2</span>i)</span></span>   = <span class="hljs-built_in">sin</span>(pos / <span class="hljs-number">10000</span>^(<span class="hljs-number">2</span>i/d_model))<br><span class="hljs-function"><span class="hljs-title">PE</span><span class="hljs-params">(pos, <span class="hljs-number">2</span>i+<span class="hljs-number">1</span>)</span></span> = <span class="hljs-built_in">cos</span>(pos / <span class="hljs-number">10000</span>^(<span class="hljs-number">2</span>i/d_model))<br></code></pre></td></tr></table></figure>
+
+<p>将位置编码<strong>加到</strong>词嵌入向量上，使相同词在不同位置有不同表示。</p>
+<hr>
+<h3 id="2-7-Decoder-Only-架构（GPT-系列）"><a href="#2-7-Decoder-Only-架构（GPT-系列）" class="headerlink" title="2.7 Decoder-Only 架构（GPT 系列）"></a>2.7 Decoder-Only 架构（GPT 系列）</h3><p><strong>核心思想</strong>：语言的本质就是预测下一个词，无需编码器。</p>
+<p><strong>自回归生成过程：</strong></p>
+<ol>
+<li>输入起始文本：”Datawhale Agent is”</li>
+<li>预测下一词：”a”</li>
+<li>将 “a” 加入输入，继续预测：”powerful”</li>
+<li>循环直到生成完整句子</li>
+</ol>
+<p><strong>掩码自注意力（Masked Self-Attention）</strong>：</p>
+<ul>
+<li>在注意力分数矩阵中，将当前位置之后的词对应分数设为 <code>-∞</code></li>
+<li>Softmax 后这些位置概率为 0</li>
+<li>确保预测时只能看到已生成的内容</li>
+</ul>
+<p><strong>Decoder-Only 的优势：</strong></p>
+<ul>
+<li>训练目标统一：只需”预测下一个词”</li>
+<li>结构简单，易于扩展到千亿参数</li>
+<li>天然适合生成任务（对话、写作、代码）</li>
+</ul>
+<hr>
+<h2 id="三、提示工程（Prompt-Engineering）"><a href="#三、提示工程（Prompt-Engineering）" class="headerlink" title="三、提示工程（Prompt Engineering）"></a>三、提示工程（Prompt Engineering）</h2><h3 id="3-1-模型采样参数"><a href="#3-1-模型采样参数" class="headerlink" title="3.1 模型采样参数"></a>3.1 模型采样参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+<th>推荐值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Temperature</strong></td>
+<td>控制输出随机性</td>
+<td>事实任务 &lt; 0.3；创意任务 0.7~1.5</td>
+</tr>
+<tr>
+<td><strong>Top-k</strong></td>
+<td>只从概率最高的 k 个词中采样</td>
+<td>k&#x3D;1 退化为贪心采样</td>
+</tr>
+<tr>
+<td><strong>Top-p</strong></td>
+<td>累积概率达到 p 的最小词集合中采样</td>
+<td>比 Top-k 更能适应分布变化</td>
+</tr>
+</tbody></table>
+<p><strong>参数优先级</strong>：Temperature → Top-k → Top-p</p>
+<blockquote>
+<p>注意：Temperature&#x3D;0 时，Top-k 和 Top-p 失效；Top-k&#x3D;1 时，其他参数失效。</p>
+</blockquote>
+<hr>
+<h3 id="3-2-三种提示策略"><a href="#3-2-三种提示策略" class="headerlink" title="3.2 三种提示策略"></a>3.2 三种提示策略</h3><p><strong>零样本提示（Zero-shot）</strong>：直接下达指令，不提供示例</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs sqf">文本：Datawhale的AI <span class="hljs-built_in">Agent</span>课程非常棒！<br>情感：<br></code></pre></td></tr></table></figure>
+
+<p><strong>单样本提示（One-shot）</strong>：提供一个示例</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sqf">文本：这家餐厅的服务太慢了。<br>情感：负面<br><br>文本：Datawhale的AI <span class="hljs-built_in">Agent</span>课程非常棒！<br>情感：<br></code></pre></td></tr></table></figure>
+
+<p><strong>少样本提示（Few-shot）</strong>：提供多个示例，覆盖不同情况，效果最佳</p>
+<hr>
+<h3 id="3-3-思维链（Chain-of-Thought-CoT）"><a href="#3-3-思维链（Chain-of-Thought-CoT）" class="headerlink" title="3.3 思维链（Chain-of-Thought, CoT）"></a>3.3 思维链（Chain-of-Thought, CoT）</h3><p>对于复杂推理任务，加入引导语 <strong>“请逐步思考”</strong> 或 **”Let’s think step by step”**：</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs tap">问题：一个篮球队80场赢了60%，接下来15场赢了12场，总胜率是多少？<br>请一步一步地思考并解答。<br><br>→ 第一步：80 × 60% = 48场<br>→ 第二步：总场数 =<span class="hljs-number"> 80 </span>+<span class="hljs-number"> 15 </span>= 95场，总胜利 =<span class="hljs-number"> 48 </span>+<span class="hljs-number"> 12 </span>= 60场<br>→ 第三步：总胜率 = 60/95 ≈ 63.16%<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-4-基础提示技巧"><a href="#3-4-基础提示技巧" class="headerlink" title="3.4 基础提示技巧"></a>3.4 基础提示技巧</h3><p><strong>角色扮演</strong>：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">你现在是一位资深的Python编程专家。请解释Python中的GIL是什么，要让初学者也能听懂。<br></code></pre></td></tr></table></figure>
+
+<p><strong>上下文示例</strong>：</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs coffeescript">我需要你从评论中提取产品名称和情感，严格按<span class="hljs-built_in">JSON</span>格式输出。<br><br>评论：这款<span class="hljs-string">&quot;星尘&quot;</span>笔记本电脑屏幕惊人，但键盘手感不好。<br>输出：&#123;<span class="hljs-string">&quot;product_name&quot;</span>: <span class="hljs-string">&quot;星尘笔记本电脑&quot;</span>, <span class="hljs-string">&quot;sentiment&quot;</span>: <span class="hljs-string">&quot;混合&quot;</span>&#125;<br><br>评论：我刚买的<span class="hljs-string">&quot;声动&quot;</span>耳机音质很棒！<br>输出：<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、文本分词（Tokenization）"><a href="#四、文本分词（Tokenization）" class="headerlink" title="四、文本分词（Tokenization）"></a>四、文本分词（Tokenization）</h2><h3 id="4-1-为什么需要子词分词"><a href="#4-1-为什么需要子词分词" class="headerlink" title="4.1 为什么需要子词分词"></a>4.1 为什么需要子词分词</h3><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>按词分词</td>
+<td>词表爆炸、未登录词（OOV）问题</td>
+</tr>
+<tr>
+<td>按字符分词</td>
+<td>单字符无语义，学习效率低</td>
+</tr>
+<tr>
+<td><strong>子词分词</strong> ✅</td>
+<td>兼顾词表大小和语义表达</td>
+</tr>
+</tbody></table>
+<p><strong>子词分词核心思想</strong>：常见词保留完整，罕见词拆分为有意义的子词片段。</p>
+<hr>
+<h3 id="4-2-BPE-算法（Byte-Pair-Encoding）"><a href="#4-2-BPE-算法（Byte-Pair-Encoding）" class="headerlink" title="4.2 BPE 算法（Byte-Pair Encoding）"></a>4.2 BPE 算法（Byte-Pair Encoding）</h3><p>GPT 系列采用的分词算法，核心是<strong>贪心合并</strong>：</p>
+<ol>
+<li>初始化：词表 &#x3D; 所有基本字符</li>
+<li>统计相邻词元对的出现频率</li>
+<li>合并频率最高的词元对，加入词表</li>
+<li>重复直到词表达到预设大小</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># BPE 核心逻辑</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_merges):<br>    pairs = get_stats(vocab)          <span class="hljs-comment"># 统计词元对频率</span><br>    best = <span class="hljs-built_in">max</span>(pairs, key=pairs.get)  <span class="hljs-comment"># 找最高频词元对</span><br>    vocab = merge_vocab(best, vocab)  <span class="hljs-comment"># 合并</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>相关算法：</strong></p>
+<ul>
+<li><strong>WordPiece</strong>（BERT）：合并标准是最大化语言模型概率</li>
+<li><strong>SentencePiece</strong>（Llama）：将空格视为普通字符，支持任意语言</li>
+</ul>
+<hr>
+<h3 id="4-3-分词对开发者的影响"><a href="#4-3-分词对开发者的影响" class="headerlink" title="4.3 分词对开发者的影响"></a>4.3 分词对开发者的影响</h3><ul>
+<li><strong>上下文窗口</strong>：以 Token 数量计算，中文比英文消耗更多 Token</li>
+<li><strong>API 成本</strong>：按 Token 计费，了解分词有助于控制成本</li>
+<li><strong>模型异常</strong>：<code>2+2</code> 和 <code>2 + 2</code> 可能被分成不同 Token，影响计算结果</li>
+</ul>
+<hr>
+<h2 id="五、缩放法则与模型局限性"><a href="#五、缩放法则与模型局限性" class="headerlink" title="五、缩放法则与模型局限性"></a>五、缩放法则与模型局限性</h2><h3 id="5-1-缩放法则（Scaling-Laws）"><a href="#5-1-缩放法则（Scaling-Laws）" class="headerlink" title="5.1 缩放法则（Scaling Laws）"></a>5.1 缩放法则（Scaling Laws）</h3><p>模型性能与<strong>参数量、数据量、计算量</strong>呈<strong>幂律关系</strong>：持续增加这三个要素，性能可预测地平滑提升。</p>
+<p><strong>Chinchilla 定律</strong>（2022）：</p>
+<ul>
+<li>最优模型参数量和训练数据量存在<strong>最优配比</strong></li>
+<li>数据量应与参数量等比例增加</li>
+<li>纠正了”越大越好”的片面认知</li>
+</ul>
+<p><strong>能力涌现（Emergent Abilities）</strong>：</p>
+<ul>
+<li>模型规模达到阈值后，突然出现小模型中不存在的能力</li>
+<li>如：链式思考、指令遵循、多步推理、代码生成</li>
+<li>这些能力在参数量达到数百亿后才显著出现</li>
+</ul>
+<hr>
+<h3 id="5-2-模型幻觉（Hallucination）"><a href="#5-2-模型幻觉（Hallucination）" class="headerlink" title="5.2 模型幻觉（Hallucination）"></a>5.2 模型幻觉（Hallucination）</h3><p><strong>定义</strong>：模型生成与客观事实矛盾，或编造不存在的信息。</p>
+<p><strong>幻觉类型：</strong></p>
+<ul>
+<li><strong>事实性幻觉</strong>：生成与现实不符的信息</li>
+<li><strong>忠实性幻觉</strong>：摘要&#x2F;翻译未忠实反映原文</li>
+<li><strong>内在幻觉</strong>：生成内容与输入信息矛盾</li>
+</ul>
+<p><strong>产生原因：</strong></p>
+<ul>
+<li>训练数据包含错误信息</li>
+<li>自回归生成机制无内置事实核查</li>
+<li>复杂推理中逻辑链条出错</li>
+</ul>
+<p><strong>缓解方法：</strong></p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>原理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>RAG（检索增强生成）</strong></td>
+<td>生成前从外部知识库检索相关信息作为上下文</td>
+</tr>
+<tr>
+<td><strong>多步推理与验证</strong></td>
+<td>引导模型逐步推理，每步自我检查</td>
+</tr>
+<tr>
+<td><strong>外部工具调用</strong></td>
+<td>调用搜索引擎、计算器获取实时准确信息</td>
+</tr>
+<tr>
+<td><strong>RLHF</strong></td>
+<td>通过人类反馈强化学习，减少有害输出</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、主流模型选型指南"><a href="#六、主流模型选型指南" class="headerlink" title="六、主流模型选型指南"></a>六、主流模型选型指南</h2><h3 id="6-1-选型关键维度"><a href="#6-1-选型关键维度" class="headerlink" title="6.1 选型关键维度"></a>6.1 选型关键维度</h3><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>性能与能力</strong></td>
+<td>参考 LMSys Chatbot Arena 等排行榜</td>
+</tr>
+<tr>
+<td><strong>成本</strong></td>
+<td>闭源按 Token 计费；开源需考虑硬件成本</td>
+</tr>
+<tr>
+<td><strong>速度（延迟）</strong></td>
+<td>实时交互场景优先考虑</td>
+</tr>
+<tr>
+<td><strong>上下文窗口</strong></td>
+<td>长文档处理需要 128K+ Token</td>
+</tr>
+<tr>
+<td><strong>部署方式</strong></td>
+<td>API 便捷但数据外传；本地部署保护隐私</td>
+</tr>
+<tr>
+<td><strong>可微调性</strong></td>
+<td>特定领域任务需要微调能力</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="6-2-主流闭源模型"><a href="#6-2-主流闭源模型" class="headerlink" title="6.2 主流闭源模型"></a>6.2 主流闭源模型</h3><table>
+<thead>
+<tr>
+<th>模型</th>
+<th>厂商</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GPT-4 &#x2F; GPT-5</strong></td>
+<td>OpenAI</td>
+<td>综合能力强，多模态，实时语音</td>
+</tr>
+<tr>
+<td><strong>Gemini 2.5 Pro</strong></td>
+<td>Google</td>
+<td>原生多模态，超长上下文窗口</td>
+</tr>
+<tr>
+<td><strong>Claude 4 Opus</strong></td>
+<td>Anthropic</td>
+<td>安全可靠，长文档处理，企业级</td>
+</tr>
+<tr>
+<td><strong>文心一言</strong></td>
+<td>百度</td>
+<td>中文优化，本土产业赋能</td>
+</tr>
+<tr>
+<td><strong>通义千问</strong></td>
+<td>阿里</td>
+<td>中文能力强，开源版本可用</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="6-3-主流开源模型"><a href="#6-3-主流开源模型" class="headerlink" title="6.3 主流开源模型"></a>6.3 主流开源模型</h3><table>
+<thead>
+<tr>
+<th>模型</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Llama 4（Meta）</strong></td>
+<td>MoE 架构，1000万 Token 上下文，多模态</td>
+</tr>
+<tr>
+<td><strong>Mistral Medium 3.1</strong></td>
+<td>小尺寸高性能，原生多模态，语调适配</td>
+</tr>
+<tr>
+<td><strong>Qwen 系列（阿里）</strong></td>
+<td>中文能力强，多尺寸可选</td>
+</tr>
+<tr>
+<td><strong>ChatGLM（清华&#x2F;智谱）</strong></td>
+<td>中文优化，活跃社区</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、本地部署开源模型"><a href="#七、本地部署开源模型" class="headerlink" title="七、本地部署开源模型"></a>七、本地部署开源模型</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> AutoModelForCausalLM, AutoTokenizer<br><br>model_id = <span class="hljs-string">&quot;Qwen/Qwen1.5-0.5B-Chat&quot;</span><br>device = <span class="hljs-string">&quot;cuda&quot;</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;cpu&quot;</span><br><br><span class="hljs-comment"># 加载模型和分词器</span><br>tokenizer = AutoTokenizer.from_pretrained(model_id)<br>model = AutoModelForCausalLM.from_pretrained(model_id).to(device)<br><br><span class="hljs-comment"># 构建对话</span><br>messages = [<br>    &#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;You are a helpful assistant.&quot;</span>&#125;,<br>    &#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;你好，请介绍你自己。&quot;</span>&#125;<br>]<br><br><span class="hljs-comment"># 分词 → 生成 → 解码</span><br>text = tokenizer.apply_chat_template(messages, tokenize=<span class="hljs-literal">False</span>, add_generation_prompt=<span class="hljs-literal">True</span>)<br>inputs = tokenizer([text], return_tensors=<span class="hljs-string">&quot;pt&quot;</span>).to(device)<br>output_ids = model.generate(inputs.input_ids, max_new_tokens=<span class="hljs-number">512</span>)<br>response = tokenizer.batch_decode(output_ids[:, inputs.input_ids.shape[<span class="hljs-number">1</span>]:], skip_special_tokens=<span class="hljs-literal">True</span>)[<span class="hljs-number">0</span>]<br><span class="hljs-built_in">print</span>(response)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><table>
+<thead>
+<tr>
+<th>知识点</th>
+<th>核心要点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>N-gram</strong></td>
+<td>马尔可夫假设，统计计数，存在稀疏性和泛化问题</td>
+</tr>
+<tr>
+<td><strong>词嵌入</strong></td>
+<td>词映射为连续向量，余弦相似度衡量语义关系</td>
+</tr>
+<tr>
+<td><strong>RNN&#x2F;LSTM</strong></td>
+<td>引入记忆机制，LSTM 门控解决长期依赖</td>
+</tr>
+<tr>
+<td><strong>Transformer</strong></td>
+<td>自注意力并行计算，多头注意力捕捉多种关系</td>
+</tr>
+<tr>
+<td><strong>Decoder-Only</strong></td>
+<td>自回归生成，掩码注意力，GPT 系列基础</td>
+</tr>
+<tr>
+<td><strong>提示工程</strong></td>
+<td>Zero&#x2F;Few-shot、CoT、角色扮演、采样参数调优</td>
+</tr>
+<tr>
+<td><strong>BPE 分词</strong></td>
+<td>子词分词，贪心合并，控制词表大小</td>
+</tr>
+<tr>
+<td><strong>缩放法则</strong></td>
+<td>参数&#x2F;数据&#x2F;算力幂律关系，能力涌现现象</td>
+</tr>
+<tr>
+<td><strong>模型幻觉</strong></td>
+<td>编造信息，RAG&#x2F;工具调用&#x2F;RLHF 缓解</td>
+</tr>
+</tbody></table>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%96%B0%E5%85%B4%E6%8A%80%E6%9C%AF/" class="category-chain-item">新兴技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+        <a href="/tags/LLM/" class="print-no-link">#LLM</a>
+      
+        <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" class="print-no-link">#大模型</a>
+      
+        <a href="/tags/Transformer/" class="print-no-link">#Transformer</a>
+      
+        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" class="print-no-link">#深度学习</a>
+      
+        <a href="/tags/NLP/" class="print-no-link">#NLP</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>大语言模型基础-从Transformer到LLM核心原理</div>
+      <div>https://1441754257.github.io/2025/04/10/大语言模型基础-从Transformer到LLM核心原理/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>贾一</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年4月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/04/01/Spring-AI%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9B%86%E6%88%90%E5%AE%9E%E6%88%98/" title="Spring-AI快速入门与大模型集成实战">
+                        <span class="hidden-mobile">Spring-AI快速入门与大模型集成实战</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
