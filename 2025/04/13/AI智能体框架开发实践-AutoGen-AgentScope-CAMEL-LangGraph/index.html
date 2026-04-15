@@ -1,0 +1,1001 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="贾一">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="AI智能体框架开发实践：AutoGen、AgentScope、CAMEL与LangGraph在之前的章节中，我们通过编写原生代码实现了 ReAct、Plan-and-Solve 和 Reflection 等智能体的核心工作流。本章我们将切换视角，探讨如何利用业界主流的智能体框架，来高效、规范地构建可靠的智能体应用。 为什么需要智能体框架从编写一次性的脚本到使用成熟的框架，是软件工程领域一次重要的思">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI智能体框架开发实践-AutoGen-AgentScope-CAMEL-LangGraph">
+<meta property="og:url" content="https://1441754257.github.io/2025/04/13/AI%E6%99%BA%E8%83%BD%E4%BD%93%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91%E5%AE%9E%E8%B7%B5-AutoGen-AgentScope-CAMEL-LangGraph/index.html">
+<meta property="og:site_name" content="贾一的技术博客">
+<meta property="og:description" content="AI智能体框架开发实践：AutoGen、AgentScope、CAMEL与LangGraph在之前的章节中，我们通过编写原生代码实现了 ReAct、Plan-and-Solve 和 Reflection 等智能体的核心工作流。本章我们将切换视角，探讨如何利用业界主流的智能体框架，来高效、规范地构建可靠的智能体应用。 为什么需要智能体框架从编写一次性的脚本到使用成熟的框架，是软件工程领域一次重要的思">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-04-13T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-15T09:02:12.770Z">
+<meta property="article:author" content="贾一">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="AutoGen">
+<meta property="article:tag" content="AgentScope">
+<meta property="article:tag" content="CAMEL">
+<meta property="article:tag" content="LangGraph">
+<meta property="article:tag" content="多智能体">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>AI智能体框架开发实践-AutoGen-AgentScope-CAMEL-LangGraph - 贾一的技术博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1441754257.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>贾一的技术博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="AI智能体框架开发实践-AutoGen-AgentScope-CAMEL-LangGraph"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-04-13 09:00" pubdate>
+          2025年4月13日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          10k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          85 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">AI智能体框架开发实践-AutoGen-AgentScope-CAMEL-LangGraph</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="AI智能体框架开发实践：AutoGen、AgentScope、CAMEL与LangGraph"><a href="#AI智能体框架开发实践：AutoGen、AgentScope、CAMEL与LangGraph" class="headerlink" title="AI智能体框架开发实践：AutoGen、AgentScope、CAMEL与LangGraph"></a>AI智能体框架开发实践：AutoGen、AgentScope、CAMEL与LangGraph</h1><p>在之前的章节中，我们通过编写原生代码实现了 ReAct、Plan-and-Solve 和 Reflection 等智能体的核心工作流。本章我们将切换视角，探讨如何利用业界主流的<strong>智能体框架</strong>，来高效、规范地构建可靠的智能体应用。</p>
+<h2 id="为什么需要智能体框架"><a href="#为什么需要智能体框架" class="headerlink" title="为什么需要智能体框架"></a>为什么需要智能体框架</h2><p>从编写一次性的脚本到使用成熟的框架，是软件工程领域一次重要的思维跃迁。相比于直接编写独立的智能体脚本，框架的价值体现在：</p>
+<ol>
+<li><strong>提升代码复用与开发效率</strong>：框架提供通用的 <code>Agent</code> 基类或执行器，封装了智能体运行的核心循环（Agent Loop），无论是 ReAct 还是 Plan-and-Solve，都可以基于框架快速搭建。</li>
+<li><strong>实现核心组件的解耦与可扩展性</strong>：框架的设计强制分离不同的关注点：<ul>
+<li><strong>模型层</strong>：负责与大语言模型交互，轻松替换不同模型</li>
+<li><strong>工具层</strong>：提供标准化的工具定义、注册和执行接口</li>
+<li><strong>记忆层</strong>：处理短期和长期记忆，可切换不同的记忆策略</li>
+</ul>
+</li>
+<li><strong>标准化复杂的状态管理</strong>：框架提供强大而通用的状态管理机制，无需每次重新处理上下文窗口限制、历史信息持久化、多轮对话状态跟踪等问题。</li>
+<li><strong>简化可观测性与调试过程</strong>：通过引入事件回调机制（如 <code>on_llm_start</code>、<code>on_tool_end</code>、<code>on_agent_finish</code>），可以轻松追踪和调试智能体的完整运行轨迹。</li>
+</ol>
+<h2 id="主流框架选型对比"><a href="#主流框架选型对比" class="headerlink" title="主流框架选型对比"></a>主流框架选型对比</h2><p>当前最具代表性的四个框架分别代表了实现复杂智能体系统的不同技术路径：</p>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>协作模式</th>
+<th>控制方式</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>AutoGen</strong></td>
+<td>对话驱动</td>
+<td>群聊协调</td>
+<td>多角色协作软件开发</td>
+</tr>
+<tr>
+<td><strong>AgentScope</strong></td>
+<td>消息驱动</td>
+<td>管道编排</td>
+<td>大规模、高可靠性生产系统</td>
+</tr>
+<tr>
+<td><strong>CAMEL</strong></td>
+<td>角色扮演</td>
+<td>引导性提示</td>
+<td>双智能体深度协作</td>
+</tr>
+<tr>
+<td><strong>LangGraph</strong></td>
+<td>图结构</td>
+<td>状态机+条件边</td>
+<td>复杂工作流、迭代修正</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="框架一：AutoGen-—-对话驱动协作"><a href="#框架一：AutoGen-—-对话驱动协作" class="headerlink" title="框架一：AutoGen — 对话驱动协作"></a>框架一：AutoGen — 对话驱动协作</h2><p>AutoGen 的核心思想是<strong>通过对话实现协作</strong>。它将多智能体系统抽象为一个由多个”可对话”智能体组成的群聊。开发者可以定义不同角色，并设定它们之间的交互规则，任务的解决过程就是这些智能体在群聊中自动化消息传递、不断迭代直至目标达成的过程。</p>
+<h3 id="新架构：分层与异步优先"><a href="#新架构：分层与异步优先" class="headerlink" title="新架构：分层与异步优先"></a>新架构：分层与异步优先</h3><p>AutoGen 0.7.4 版本引入了清晰的分层和异步优先设计：</p>
+<ul>
+<li><strong>autogen-core</strong>：底层基础模块，封装语言模型交互、消息传递等核心功能</li>
+<li><strong>autogen-agentchat</strong>：高级接口，简化多智能体应用开发</li>
+</ul>
+<p>新架构全面转向异步编程（<code>async/await</code>），在多智能体协作场景中，系统在等待一个智能体响应时可以处理其他任务，避免线程阻塞。</p>
+<h3 id="核心智能体组件"><a href="#核心智能体组件" class="headerlink" title="核心智能体组件"></a>核心智能体组件</h3><ul>
+<li><strong>AssistantAgent（助理智能体）</strong>：封装大语言模型，根据对话历史生成回复</li>
+<li><strong>UserProxyAgent（用户代理智能体）</strong>：扮演人类用户的”代言人”和”执行器”，可配置为执行代码或调用工具</li>
+<li><strong>RoundRobinGroupChat（轮询群聊）</strong>：让智能体按预定义顺序依次发言，适合流程固定的任务</li>
+</ul>
+<h3 id="实战案例：软件开发团队"><a href="#实战案例：软件开发团队" class="headerlink" title="实战案例：软件开发团队"></a>实战案例：软件开发团队</h3><p>构建一个模拟的软件开发团队，协作开发一个<strong>比特币价格显示应用</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> autogen_ext.models.openai <span class="hljs-keyword">import</span> OpenAIChatCompletionClient<br><span class="hljs-keyword">from</span> autogen_agentchat.teams <span class="hljs-keyword">import</span> RoundRobinGroupChat<br><span class="hljs-keyword">from</span> autogen_agentchat.conditions <span class="hljs-keyword">import</span> TextMentionTermination<br><span class="hljs-keyword">import</span> os<br><br><span class="hljs-comment"># 创建模型客户端</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_openai_model_client</span>():<br>    <span class="hljs-keyword">return</span> OpenAIChatCompletionClient(<br>        model=os.getenv(<span class="hljs-string">&quot;LLM_MODEL_ID&quot;</span>, <span class="hljs-string">&quot;gpt-4o&quot;</span>),<br>        api_key=os.getenv(<span class="hljs-string">&quot;LLM_API_KEY&quot;</span>),<br>        base_url=os.getenv(<span class="hljs-string">&quot;LLM_BASE_URL&quot;</span>, <span class="hljs-string">&quot;https://api.openai.com/v1&quot;</span>)<br>    )<br><br><span class="hljs-comment"># 创建产品经理</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_product_manager</span>(<span class="hljs-params">model_client</span>):<br>    system_message = <span class="hljs-string">&quot;&quot;&quot;你是一位经验丰富的产品经理，专门负责软件产品的需求分析和项目规划。</span><br><span class="hljs-string">核心职责：需求分析、技术规划、风险评估、协调沟通。</span><br><span class="hljs-string">请简洁明了地回应，并在分析完成后说&quot;请工程师开始实现&quot;。&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">return</span> AssistantAgent(name=<span class="hljs-string">&quot;ProductManager&quot;</span>, model_client=model_client, system_message=system_message)<br><br><span class="hljs-comment"># 创建工程师</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_engineer</span>(<span class="hljs-params">model_client</span>):<br>    system_message = <span class="hljs-string">&quot;&quot;&quot;你是一位资深的软件工程师，擅长 Python 开发和 Web 应用构建。</span><br><span class="hljs-string">技术专长：Python 编程、Web 开发、API 集成、错误处理。</span><br><span class="hljs-string">请提供完整的可运行代码，并在完成后说&quot;请代码审查员检查&quot;。&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">return</span> AssistantAgent(name=<span class="hljs-string">&quot;Engineer&quot;</span>, model_client=model_client, system_message=system_message)<br><br><span class="hljs-comment"># 创建代码审查员</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_code_reviewer</span>(<span class="hljs-params">model_client</span>):<br>    system_message = <span class="hljs-string">&quot;&quot;&quot;你是一位经验丰富的代码审查专家。</span><br><span class="hljs-string">审查重点：代码质量、安全性、最佳实践、错误处理。</span><br><span class="hljs-string">完成后说&quot;代码审查完成，请用户代理测试&quot;。&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">return</span> AssistantAgent(name=<span class="hljs-string">&quot;CodeReviewer&quot;</span>, model_client=model_client, system_message=system_message)<br><br><span class="hljs-comment"># 创建用户代理</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">create_user_proxy</span>():<br>    <span class="hljs-keyword">return</span> UserProxyAgent(name=<span class="hljs-string">&quot;UserProxy&quot;</span>, description=<span class="hljs-string">&quot;代表用户提出需求，执行验证代码，完成测试后请回复 TERMINATE。&quot;</span>)<br><br><span class="hljs-comment"># 定义团队协作流程</span><br>team_chat = RoundRobinGroupChat(<br>    participants=[product_manager, engineer, code_reviewer, user_proxy],<br>    termination_condition=TextMentionTermination(<span class="hljs-string">&quot;TERMINATE&quot;</span>),<br>    max_turns=<span class="hljs-number">20</span>,<br>)<br></code></pre></td></tr></table></figure>
+
+<p>预期协作流程：产品经理提出需求 → 工程师编写代码 → 代码审查员检查 → 用户代理测试验证 → 输出 <code>TERMINATE</code> 结束。</p>
+<h3 id="AutoGen-优势与局限"><a href="#AutoGen-优势与局限" class="headerlink" title="AutoGen 优势与局限"></a>AutoGen 优势与局限</h3><p><strong>优势</strong>：</p>
+<ul>
+<li>无需设计复杂状态机，协作流程自然映射为对话</li>
+<li>通过系统消息为每个智能体赋予高度专业化的角色，易于复用</li>
+<li><code>UserProxyAgent</code> 为”人类在环”提供天然接口</li>
+</ul>
+<p><strong>局限</strong>：</p>
+<ul>
+<li>基于 LLM 的对话具有不确定性，可能偏离预期或陷入循环</li>
+<li>调试过程棘手，得到的是长串对话历史而非清晰错误堆栈</li>
+</ul>
+<hr>
+<h2 id="框架二：AgentScope-—-消息驱动架构"><a href="#框架二：AgentScope-—-消息驱动架构" class="headerlink" title="框架二：AgentScope — 消息驱动架构"></a>框架二：AgentScope — 消息驱动架构</h2><p>AgentScope 由阿里巴巴达摩院开发，专为构建大规模、高可靠性的多智能体应用设计。其核心特点是<strong>工程化优先</strong>，内置分布式部署、容错恢复、可观测性等企业级特性。</p>
+<h3 id="消息驱动架构"><a href="#消息驱动架构" class="headerlink" title="消息驱动架构"></a>消息驱动架构</h3><p>AgentScope 将所有智能体交互抽象为<strong>消息的发送和接收</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> agentscope.message <span class="hljs-keyword">import</span> Msg<br><br>message = Msg(<br>    name=<span class="hljs-string">&quot;Alice&quot;</span>,<br>    content=<span class="hljs-string">&quot;Hello, Bob!&quot;</span>,<br>    role=<span class="hljs-string">&quot;user&quot;</span>,<br>    metadata=&#123;<span class="hljs-string">&quot;timestamp&quot;</span>: <span class="hljs-string">&quot;2024-01-15T10:30:00Z&quot;</span>, <span class="hljs-string">&quot;priority&quot;</span>: <span class="hljs-string">&quot;normal&quot;</span>&#125;<br>)<br></code></pre></td></tr></table></figure>
+
+<p>消息驱动带来的优势：</p>
+<ul>
+<li><strong>异步解耦</strong>：发送方和接收方在时间上解耦，天然支持高并发</li>
+<li><strong>位置透明</strong>：智能体无需关心对方是在本地还是远程服务器</li>
+<li><strong>可观测性</strong>：每条消息都可被记录、追踪和分析</li>
+<li><strong>可靠性</strong>：消息可被持久化存储和重试，保证最终一致性</li>
+</ul>
+<h3 id="MsgHub-消息中心"><a href="#MsgHub-消息中心" class="headerlink" title="MsgHub 消息中心"></a>MsgHub 消息中心</h3><p>MsgHub 是整个消息驱动架构的中枢：</p>
+<ul>
+<li><strong>灵活的消息路由</strong>：支持点对点、广播、组播等多种通信模式</li>
+<li><strong>消息持久化</strong>：自动保存到数据库（SQLite、MongoDB），支持状态恢复</li>
+<li><strong>原生分布式支持</strong>：智能体可部署在不同进程或服务器上，RPC 自动处理跨节点通信</li>
+</ul>
+<h3 id="智能体生命周期"><a href="#智能体生命周期" class="headerlink" title="智能体生命周期"></a>智能体生命周期</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> agentscope.agents <span class="hljs-keyword">import</span> AgentBase<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">CustomAgent</span>(<span class="hljs-title class_ inherited__">AgentBase</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, name: <span class="hljs-built_in">str</span>, **kwargs</span>):<br>        <span class="hljs-built_in">super</span>().__init__(name=name, **kwargs)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">reply</span>(<span class="hljs-params">self, x: Msg</span>) -&gt; Msg:<br>        response = <span class="hljs-variable language_">self</span>.model(x.content)<br>        <span class="hljs-keyword">return</span> Msg(name=<span class="hljs-variable language_">self</span>.name, content=response, role=<span class="hljs-string">&quot;assistant&quot;</span>)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">observe</span>(<span class="hljs-params">self, x: Msg</span>) -&gt; <span class="hljs-literal">None</span>:<br>        <span class="hljs-variable language_">self</span>.memory.add(x)<br></code></pre></td></tr></table></figure>
+
+<h3 id="实战案例：三国狼人杀"><a href="#实战案例：三国狼人杀" class="headerlink" title="实战案例：三国狼人杀"></a>实战案例：三国狼人杀</h3><p>通过消息驱动架构构建融合三国文化的狼人杀游戏。每个角色智能体需同时扮演”游戏功能角色”（狼人、预言家）和”三国人格角色”（刘备、曹操）。游戏流程通过 MsgHub 自然建模为消息交互模式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 并行收集所有玩家的投票决策</span><br>vote_msgs = <span class="hljs-keyword">await</span> fanout_pipeline(<br>    <span class="hljs-variable language_">self</span>.alive_players,<br>    <span class="hljs-keyword">await</span> <span class="hljs-variable language_">self</span>.moderator.announce(<span class="hljs-string">&quot;请投票选择要淘汰的玩家&quot;</span>),<br>    structured_model=get_vote_model_cn(<span class="hljs-variable language_">self</span>.alive_players),<br>    enable_gather=<span class="hljs-literal">False</span>,<br>)<br></code></pre></td></tr></table></figure>
+
+<p>通过结构化输出约束游戏规则：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">WitchActionModelCN</span>(<span class="hljs-title class_ inherited__">BaseModel</span>):<br>    use_antidote: <span class="hljs-built_in">bool</span> = Field(description=<span class="hljs-string">&quot;是否使用解药&quot;</span>)<br>    use_poison: <span class="hljs-built_in">bool</span> = Field(description=<span class="hljs-string">&quot;是否使用毒药&quot;</span>)<br>    target_name: <span class="hljs-type">Optional</span>[<span class="hljs-built_in">str</span>] = Field(description=<span class="hljs-string">&quot;毒药目标玩家姓名&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="AgentScope-优势与局限"><a href="#AgentScope-优势与局限" class="headerlink" title="AgentScope 优势与局限"></a>AgentScope 优势与局限</h3><p><strong>优势</strong>：消息驱动架构原生支持并发和容错，结构化输出机制自动约束游戏规则，分布式部署能力适合大规模生产系统。</p>
+<p><strong>局限</strong>：消息驱动架构对开发者技术要求较高，需要理解异步编程、分布式通信等概念，存在”过度工程化”的风险。</p>
+<hr>
+<h2 id="框架三：CAMEL-—-角色扮演范式"><a href="#框架三：CAMEL-—-角色扮演范式" class="headerlink" title="框架三：CAMEL — 角色扮演范式"></a>框架三：CAMEL — 角色扮演范式</h2><p>CAMEL 的核心目标是探索如何在最少的人类干预下，让两个智能体通过”角色扮演”自主协作解决复杂任务。</p>
+<h3 id="核心机制"><a href="#核心机制" class="headerlink" title="核心机制"></a>核心机制</h3><p>CAMEL 实现了<strong>角色扮演 (Role-Playing)</strong> 和<strong>引导性提示 (Inception Prompting)</strong> 两大核心概念。</p>
+<p>两个智能体被赋予互补的角色：一方扮演”AI 用户”（负责提出需求、构思任务步骤），另一方扮演”AI 助理”（负责执行操作和提供解决方案）。引导性提示会分别注入给两个智能体，包含：明确自身角色、告知协作者角色、定义共同目标、设定行为约束和沟通协议。</p>
+<h3 id="实战案例：AI科普电子书创作"><a href="#实战案例：AI科普电子书创作" class="headerlink" title="实战案例：AI科普电子书创作"></a>实战案例：AI科普电子书创作</h3><p>让心理学家和作家协作创作关于”拖延症心理学”的电子书：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> camel.societies <span class="hljs-keyword">import</span> RolePlaying<br><span class="hljs-keyword">from</span> camel.models <span class="hljs-keyword">import</span> ModelFactory<br><span class="hljs-keyword">from</span> camel.types <span class="hljs-keyword">import</span> ModelPlatformType<br><span class="hljs-keyword">from</span> dotenv <span class="hljs-keyword">import</span> load_dotenv<br><span class="hljs-keyword">import</span> os<br><br>load_dotenv()<br><br><span class="hljs-comment"># 创建模型（以通义千问为例）</span><br>model = ModelFactory.create(<br>    model_platform=ModelPlatformType.QWEN,<br>    model_type=os.getenv(<span class="hljs-string">&quot;LLM_MODEL&quot;</span>),<br>    url=os.getenv(<span class="hljs-string">&quot;LLM_BASE_URL&quot;</span>),<br>    api_key=os.getenv(<span class="hljs-string">&quot;LLM_API_KEY&quot;</span>)<br>)<br><br><span class="hljs-comment"># 初始化角色扮演会话</span><br>role_play_session = RolePlaying(<br>    assistant_role_name=<span class="hljs-string">&quot;心理学家&quot;</span>,<br>    user_role_name=<span class="hljs-string">&quot;作家&quot;</span>,<br>    task_prompt=<span class="hljs-string">&quot;&quot;&quot;创作一本关于&quot;拖延症心理学&quot;的短篇电子书：</span><br><span class="hljs-string">    1. 内容科学严谨，基于实证研究</span><br><span class="hljs-string">    2. 语言通俗易懂，避免过多专业术语</span><br><span class="hljs-string">    3. 包含实用的改善建议和案例分析</span><br><span class="hljs-string">    4. 篇幅控制在8000-10000字&quot;&quot;&quot;</span>,<br>    model=model,<br>    with_task_specify=<span class="hljs-literal">False</span>,<br>)<br><br><span class="hljs-comment"># 启动自动化对话</span><br>chat_turn_limit, n = <span class="hljs-number">30</span>, <span class="hljs-number">0</span><br>input_msg = role_play_session.init_chat()<br><br><span class="hljs-keyword">while</span> n &lt; chat_turn_limit:<br>    n += <span class="hljs-number">1</span><br>    assistant_response, user_response = role_play_session.step(input_msg)<br>    <span class="hljs-keyword">if</span> assistant_response.msg <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">or</span> user_response.msg <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>        <span class="hljs-keyword">break</span><br>    <span class="hljs-comment"># 检查任务完成标志</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;&lt;CAMEL_TASK_DONE&gt;&quot;</span> <span class="hljs-keyword">in</span> user_response.msg.content:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;✅ 电子书创作完成！&quot;</span>)<br>        <span class="hljs-keyword">break</span><br>    input_msg = assistant_response.msg<br></code></pre></td></tr></table></figure>
+
+<p>协作流程自然分为四个阶段：<strong>框架搭建与目标对齐</strong> → <strong>核心内容生成与知识转译</strong> → <strong>迭代优化与质量保证</strong> → <strong>总结与升华</strong>。</p>
+<h3 id="CAMEL-优势与局限"><a href="#CAMEL-优势与局限" class="headerlink" title="CAMEL 优势与局限"></a>CAMEL 优势与局限</h3><p><strong>优势</strong>：”轻架构、重提示”的设计哲学，通过精心设计的初始提示就能实现高质量的智能体协作，自然涌现的协作行为比硬编码工作流更灵活高效。</p>
+<p><strong>局限</strong>：对提示工程高度依赖，双智能体协作表现出色但大规模多智能体场景管理复杂，缺乏复杂对话路由和分布式状态管理能力。</p>
+<hr>
+<h2 id="框架四：LangGraph-—-图结构工作流"><a href="#框架四：LangGraph-—-图结构工作流" class="headerlink" title="框架四：LangGraph — 图结构工作流"></a>框架四：LangGraph — 图结构工作流</h2><p>LangGraph 将智能体的执行流程建模为<strong>状态机</strong>，并表示为<strong>有向图</strong>。图的节点代表计算步骤（如调用 LLM、执行工具），边定义从一个节点到另一个节点的跳转逻辑。这种设计的革命性之处在于<strong>天然支持循环</strong>，使构建迭代、反思、自我修正的复杂智能体工作流变得直观简单。</p>
+<h3 id="三大基本要素"><a href="#三大基本要素" class="headerlink" title="三大基本要素"></a>三大基本要素</h3><p><strong>全局状态（State）</strong>：整个图的执行过程围绕一个共享的 TypedDict 进行：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> TypedDict, <span class="hljs-type">List</span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">AgentState</span>(<span class="hljs-title class_ inherited__">TypedDict</span>):<br>    messages: <span class="hljs-type">List</span>[<span class="hljs-built_in">str</span>]      <span class="hljs-comment"># 对话历史</span><br>    current_task: <span class="hljs-built_in">str</span>        <span class="hljs-comment"># 当前任务</span><br>    final_answer: <span class="hljs-built_in">str</span>        <span class="hljs-comment"># 最终答案</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>节点（Nodes）</strong>：每个节点是接收当前状态并返回更新后状态的 Python 函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">planner_node</span>(<span class="hljs-params">state: AgentState</span>) -&gt; AgentState:<br>    plan = <span class="hljs-string">f&quot;为任务 &#x27;<span class="hljs-subst">&#123;state[<span class="hljs-string">&#x27;current_task&#x27;</span>]&#125;</span>&#x27; 生成的计划...&quot;</span><br>    state[<span class="hljs-string">&quot;messages&quot;</span>].append(plan)<br>    <span class="hljs-keyword">return</span> state<br></code></pre></td></tr></table></figure>
+
+<p><strong>边（Edges）</strong>：边连接节点定义工作流方向，条件边通过函数动态决定下一步：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">should_continue</span>(<span class="hljs-params">state: AgentState</span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(state[<span class="hljs-string">&quot;messages&quot;</span>]) &lt; <span class="hljs-number">3</span>:<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;continue_to_planner&quot;</span><br>    <span class="hljs-keyword">else</span>:<br>        state[<span class="hljs-string">&quot;final_answer&quot;</span>] = state[<span class="hljs-string">&quot;messages&quot;</span>][-<span class="hljs-number">1</span>]<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;end_workflow&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="实战案例：三步问答助手"><a href="#实战案例：三步问答助手" class="headerlink" title="实战案例：三步问答助手"></a>实战案例：三步问答助手</h3><p>构建一个遵循”理解 → 搜索 → 回答”三步流程的问答助手：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> TypedDict, Annotated<br><span class="hljs-keyword">from</span> langgraph.graph.message <span class="hljs-keyword">import</span> add_messages<br><span class="hljs-keyword">from</span> langchain_openai <span class="hljs-keyword">import</span> ChatOpenAI<br><span class="hljs-keyword">from</span> langgraph.graph <span class="hljs-keyword">import</span> StateGraph, START, END<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">SearchState</span>(<span class="hljs-title class_ inherited__">TypedDict</span>):<br>    messages: Annotated[<span class="hljs-built_in">list</span>, add_messages]<br>    user_query: <span class="hljs-built_in">str</span>      <span class="hljs-comment"># 理解后的用户需求总结</span><br>    search_query: <span class="hljs-built_in">str</span>    <span class="hljs-comment"># 优化后的搜索查询</span><br>    search_results: <span class="hljs-built_in">str</span>  <span class="hljs-comment"># 搜索结果</span><br>    final_answer: <span class="hljs-built_in">str</span>    <span class="hljs-comment"># 最终答案</span><br>    step: <span class="hljs-built_in">str</span>            <span class="hljs-comment"># 当前步骤</span><br><br><span class="hljs-comment"># 理解与查询节点</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">understand_query_node</span>(<span class="hljs-params">state: SearchState</span>) -&gt; <span class="hljs-built_in">dict</span>:<br>    user_message = state[<span class="hljs-string">&quot;messages&quot;</span>][-<span class="hljs-number">1</span>].content<br>    understand_prompt = <span class="hljs-string">f&quot;&quot;&quot;分析用户查询：&quot;<span class="hljs-subst">&#123;user_message&#125;</span>&quot;</span><br><span class="hljs-string">    生成最适合搜索引擎的关键词（中英文均可，要精准）</span><br><span class="hljs-string">    格式：理解：[用户需求总结]  搜索词：[最佳搜索关键词]&quot;&quot;&quot;</span><br>    response = llm.invoke([SystemMessage(content=understand_prompt)])<br>    search_query = user_message<br>    <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;搜索词：&quot;</span> <span class="hljs-keyword">in</span> response.content:<br>        search_query = response.content.split(<span class="hljs-string">&quot;搜索词：&quot;</span>)[<span class="hljs-number">1</span>].strip()<br>    <span class="hljs-keyword">return</span> &#123;<span class="hljs-string">&quot;user_query&quot;</span>: response.content, <span class="hljs-string">&quot;search_query&quot;</span>: search_query, <span class="hljs-string">&quot;step&quot;</span>: <span class="hljs-string">&quot;understood&quot;</span>&#125;<br><br><span class="hljs-comment"># 搜索节点</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">tavily_search_node</span>(<span class="hljs-params">state: SearchState</span>) -&gt; <span class="hljs-built_in">dict</span>:<br>    <span class="hljs-keyword">try</span>:<br>        response = tavily_client.search(query=state[<span class="hljs-string">&quot;search_query&quot;</span>], max_results=<span class="hljs-number">5</span>)<br>        search_results = format_results(response)<br>        <span class="hljs-keyword">return</span> &#123;<span class="hljs-string">&quot;search_results&quot;</span>: search_results, <span class="hljs-string">&quot;step&quot;</span>: <span class="hljs-string">&quot;searched&quot;</span>&#125;<br>    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>        <span class="hljs-keyword">return</span> &#123;<span class="hljs-string">&quot;search_results&quot;</span>: <span class="hljs-string">f&quot;搜索失败：<span class="hljs-subst">&#123;e&#125;</span>&quot;</span>, <span class="hljs-string">&quot;step&quot;</span>: <span class="hljs-string">&quot;search_failed&quot;</span>&#125;<br><br><span class="hljs-comment"># 回答节点</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">generate_answer_node</span>(<span class="hljs-params">state: SearchState</span>) -&gt; <span class="hljs-built_in">dict</span>:<br>    <span class="hljs-keyword">if</span> state[<span class="hljs-string">&quot;step&quot;</span>] == <span class="hljs-string">&quot;search_failed&quot;</span>:<br>        prompt = <span class="hljs-string">f&quot;搜索API暂时不可用，请基于您的知识回答：<span class="hljs-subst">&#123;state[<span class="hljs-string">&#x27;user_query&#x27;</span>]&#125;</span>&quot;</span><br>    <span class="hljs-keyword">else</span>:<br>        prompt = <span class="hljs-string">f&quot;基于搜索结果回答：<span class="hljs-subst">&#123;state[<span class="hljs-string">&#x27;user_query&#x27;</span>]&#125;</span>\n搜索结果：\n<span class="hljs-subst">&#123;state[<span class="hljs-string">&#x27;search_results&#x27;</span>]&#125;</span>&quot;</span><br>    response = llm.invoke([SystemMessage(content=prompt)])<br>    <span class="hljs-keyword">return</span> &#123;<span class="hljs-string">&quot;final_answer&quot;</span>: response.content, <span class="hljs-string">&quot;step&quot;</span>: <span class="hljs-string">&quot;completed&quot;</span>&#125;<br><br><span class="hljs-comment"># 构建图</span><br>workflow = StateGraph(SearchState)<br>workflow.add_node(<span class="hljs-string">&quot;understand&quot;</span>, understand_query_node)<br>workflow.add_node(<span class="hljs-string">&quot;search&quot;</span>, tavily_search_node)<br>workflow.add_node(<span class="hljs-string">&quot;answer&quot;</span>, generate_answer_node)<br>workflow.add_edge(START, <span class="hljs-string">&quot;understand&quot;</span>)<br>workflow.add_edge(<span class="hljs-string">&quot;understand&quot;</span>, <span class="hljs-string">&quot;search&quot;</span>)<br>workflow.add_edge(<span class="hljs-string">&quot;search&quot;</span>, <span class="hljs-string">&quot;answer&quot;</span>)<br>workflow.add_edge(<span class="hljs-string">&quot;answer&quot;</span>, END)<br>app = workflow.<span class="hljs-built_in">compile</span>()<br></code></pre></td></tr></table></figure>
+
+<h3 id="LangGraph-优势与局限"><a href="#LangGraph-优势与局限" class="headerlink" title="LangGraph 优势与局限"></a>LangGraph 优势与局限</h3><p><strong>优势</strong>：工作流高度可控与可预测，对<strong>循环（Cycles）</strong>的原生支持使得”反思-修正”循环的实现非常简单，每个节点是独立 Python 函数带来高模块化，插入人类审核节点非常直接。</p>
+<p><strong>局限</strong>：需要编写更多前期代码，行为虽然可控但缺少对话式智能体那种”涌现”式的交互，调试需要开发者对整个图的运行机制有全局性理解。</p>
+<hr>
+<h2 id="框架选型指南"><a href="#框架选型指南" class="headerlink" title="框架选型指南"></a>框架选型指南</h2><p>不同框架体现了不同的设计哲学——**”涌现式协作”与”显式控制”之间的选择**：</p>
+<ul>
+<li><strong>AutoGen 和 CAMEL</strong> 更依赖于定义智能体的”角色”和”目标”，让复杂的协作行为从简单的对话规则中”涌现”出来。这种方式更贴近人类的交互模式，但有时难以预测和调试。</li>
+<li><strong>LangGraph</strong> 要求开发者明确地定义每一个步骤和跳转条件，牺牲一部分”涌现”的惊喜，换来了高度的可靠性、可控性和可观测性。</li>
+<li><strong>AgentScope</strong> 则揭示了另一个重要维度——<strong>工程化</strong>。无论选择哪种协作范式，要将其从实验原型推向生产应用，都必须面对并发、容错、分布式部署等工程挑战。</li>
+</ul>
+<h3 id="选型建议"><a href="#选型建议" class="headerlink" title="选型建议"></a>选型建议</h3><table>
+<thead>
+<tr>
+<th>应用场景</th>
+<th>推荐框架</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>智能客服（高并发、7×24稳定）</td>
+<td>AgentScope</td>
+<td>工业级工程化能力、分布式部署</td>
+</tr>
+<tr>
+<td>科研论文协作写作</td>
+<td>CAMEL</td>
+<td>双智能体深度协作、轻量级提示驱动</td>
+</tr>
+<tr>
+<td>金融风控审批（严格流程、可追溯）</td>
+<td>LangGraph</td>
+<td>显式流程控制、高度可审计</td>
+</tr>
+<tr>
+<td>软件开发团队自动化</td>
+<td>AutoGen</td>
+<td>对话驱动协作、多角色群聊</td>
+</tr>
+</tbody></table>
+<p>智能体并非只有一种构建方式。深入理解各框架的设计哲学，能让我们不仅成为更优秀的”工具使用者”，更能理解框架设计中的各种优劣与权衡。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%96%B0%E5%85%B4%E6%8A%80%E6%9C%AF/" class="category-chain-item">新兴技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+        <a href="/tags/Agent/" class="print-no-link">#Agent</a>
+      
+        <a href="/tags/AutoGen/" class="print-no-link">#AutoGen</a>
+      
+        <a href="/tags/AgentScope/" class="print-no-link">#AgentScope</a>
+      
+        <a href="/tags/CAMEL/" class="print-no-link">#CAMEL</a>
+      
+        <a href="/tags/LangGraph/" class="print-no-link">#LangGraph</a>
+      
+        <a href="/tags/%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93/" class="print-no-link">#多智能体</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>AI智能体框架开发实践-AutoGen-AgentScope-CAMEL-LangGraph</div>
+      <div>https://1441754257.github.io/2025/04/13/AI智能体框架开发实践-AutoGen-AgentScope-CAMEL-LangGraph/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>贾一</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年4月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/04/13/Transformer%E6%A8%A1%E5%9E%8B%E8%AF%A6%E8%A7%A3-%E5%9B%BE%E8%A7%A3Attention%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86/" title="Transformer模型详解-图解Attention机制原理">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Transformer模型详解-图解Attention机制原理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/04/10/%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80-%E4%BB%8ETransformer%E5%88%B0LLM%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" title="大语言模型基础-从Transformer到LLM核心原理">
+                        <span class="hidden-mobile">大语言模型基础-从Transformer到LLM核心原理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
