@@ -1,0 +1,1103 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="贾一">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="AI上下文工程与长程智能体实战在前面的章节中，我们为智能体引入了记忆系统与RAG。然而，要让智能体在真实复杂场景中稳定地”思考”与”行动”，仅有记忆与检索还不够——我们需要一套工程化方法，持续、系统地为模型构造恰当的”上下文”。这就是上下文工程（Context Engineering）的核心目标。 一、什么是上下文工程1.1 从提示工程到上下文工程在LLM工程早期，提示工程是主要工作——针对单轮分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI上下文工程与长程智能体实战-ContextBuilder-NoteTool-TerminalTool">
+<meta property="og:url" content="https://1441754257.github.io/2025/04/16/AI%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8B%E4%B8%8E%E9%95%BF%E7%A8%8B%E6%99%BA%E8%83%BD%E4%BD%93%E5%AE%9E%E6%88%98-ContextBuilder-NoteTool-TerminalTool/index.html">
+<meta property="og:site_name" content="贾一的技术博客">
+<meta property="og:description" content="AI上下文工程与长程智能体实战在前面的章节中，我们为智能体引入了记忆系统与RAG。然而，要让智能体在真实复杂场景中稳定地”思考”与”行动”，仅有记忆与检索还不够——我们需要一套工程化方法，持续、系统地为模型构造恰当的”上下文”。这就是上下文工程（Context Engineering）的核心目标。 一、什么是上下文工程1.1 从提示工程到上下文工程在LLM工程早期，提示工程是主要工作——针对单轮分">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-04-16T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-29T09:50:18.944Z">
+<meta property="article:author" content="贾一">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="上下文工程">
+<meta property="article:tag" content="ContextBuilder">
+<meta property="article:tag" content="NoteTool">
+<meta property="article:tag" content="TerminalTool">
+<meta property="article:tag" content="GSSC">
+<meta property="article:tag" content="长程任务">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>AI上下文工程与长程智能体实战-ContextBuilder-NoteTool-TerminalTool - 贾一的技术博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"1441754257.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>贾一的技术博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="AI上下文工程与长程智能体实战-ContextBuilder-NoteTool-TerminalTool"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-04-16 09:00" pubdate>
+          2025年4月16日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          19k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          160 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">AI上下文工程与长程智能体实战-ContextBuilder-NoteTool-TerminalTool</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="AI上下文工程与长程智能体实战"><a href="#AI上下文工程与长程智能体实战" class="headerlink" title="AI上下文工程与长程智能体实战"></a>AI上下文工程与长程智能体实战</h1><p>在前面的章节中，我们为智能体引入了记忆系统与RAG。然而，要让智能体在真实复杂场景中稳定地”思考”与”行动”，仅有记忆与检索还不够——我们需要一套工程化方法，持续、系统地为模型构造恰当的”上下文”。这就是<strong>上下文工程（Context Engineering）</strong>的核心目标。</p>
+<h2 id="一、什么是上下文工程"><a href="#一、什么是上下文工程" class="headerlink" title="一、什么是上下文工程"></a>一、什么是上下文工程</h2><h3 id="1-1-从提示工程到上下文工程"><a href="#1-1-从提示工程到上下文工程" class="headerlink" title="1.1 从提示工程到上下文工程"></a>1.1 从提示工程到上下文工程</h3><p>在LLM工程早期，提示工程是主要工作——针对单轮分类或文本生成做精调式的提示优化。但随着我们开始构建更强的智能体，它们在更长的时间范围内跨多次推理轮次工作，我们就需要能管理<strong>整个上下文状态</strong>的策略。</p>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>提示工程</th>
+<th>上下文工程</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>核心关注</strong></td>
+<td>如何写出有效提示</td>
+<td>策划与维护”最优的信息集合(tokens)”</td>
+</tr>
+<tr>
+<td><strong>信息范围</strong></td>
+<td>仅提示词本身</td>
+<td>提示+工具+MCP+外部数据+消息历史等</td>
+</tr>
+<tr>
+<td><strong>时间跨度</strong></td>
+<td>单轮或短对话</td>
+<td>长时程、多轮对话</td>
+</tr>
+<tr>
+<td><strong>目标</strong></td>
+<td>优化单次输出质量</td>
+<td>优化整个上下文状态的效用</td>
+</tr>
+</tbody></table>
+<p><strong>核心定义</strong>：上下文工程关注的是”在每一次模型调用前，如何以可复用、可度量、可演进的方式，拼装并优化输入上下文”，从而提升正确性、鲁棒性与效率。</p>
+<h3 id="1-2-上下文工程的核心挑战"><a href="#1-2-上下文工程的核心挑战" class="headerlink" title="1.2 上下文工程的核心挑战"></a>1.2 上下文工程的核心挑战</h3><p>尽管模型的速度越来越快、可处理的数据规模越来越大，但LLM和人类一样，在一定点上会”走神”或”混乱”。<strong>上下文腐蚀（context rot）</strong>现象揭示了一个核心问题：随着上下文窗口中的tokens增加，模型从上下文中准确回忆信息的能力反而下降。</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">注意力预算模型：<br><span class="hljs-bullet">- </span>Transformer让每个token能与所有token建立关联，形成O(n²)的两两注意力关系<br><span class="hljs-bullet">- </span>随着上下文增长，模型对这些两两关系的建模能力被&quot;拉薄&quot;<br><span class="hljs-bullet">- </span>位置编码插值技术可适配比训练期更长的序列，但会牺牲部分位置精确理解<br></code></pre></td></tr></table></figure>
+
+<p><strong>结论</strong>：上下文必须被视作一种<strong>有限资源</strong>，且具有<strong>边际收益递减</strong>。就像人类有有限的工作记忆容量一样，LLM也有一笔”注意力预算”。每新增一个token，都会消耗预算的一部分。</p>
+<h2 id="二、有效上下文的”解剖学”"><a href="#二、有效上下文的”解剖学”" class="headerlink" title="二、有效上下文的”解剖学”"></a>二、有效上下文的”解剖学”</h2><h3 id="2-1-三大核心组件"><a href="#2-1-三大核心组件" class="headerlink" title="2.1 三大核心组件"></a>2.1 三大核心组件</h3><p>在”有限注意力预算”的约束下，优秀的上下文工程目标是：<strong>用尽可能少、但高信号密度的tokens，最大化获得期望结果的概率</strong>。</p>
+<p><strong>（1）系统提示（System Prompt）</strong></p>
+<p>常见两极误区：</p>
+<ul>
+<li><strong>过度硬编码</strong>：在提示中写入复杂脆弱的if-else逻辑，长期维护成本高、易碎</li>
+<li><strong>过于空泛</strong>：只给出宏观目标，缺少对期望输出的具体信号</li>
+</ul>
+<p>建议将提示分区组织（如background_information、instructions、工具指引、输出描述等），用XML&#x2F;Markdown分隔。追求”最小必要信息集”——先用最好的模型在最小提示上试跑，再依据失败模式增补指令与示例。</p>
+<p><strong>（2）工具（Tools）</strong></p>
+<p>工具定义了智能体与信息&#x2F;行动空间的契约，必须促进效率：</p>
+<ul>
+<li>职责单一、相互低重叠，接口语义清晰</li>
+<li>对错误鲁棒</li>
+<li>入参描述明确、无歧义</li>
+</ul>
+<p>常见失败模式是”臃肿工具集”：功能边界模糊，导致”选哪个工具”本身含混不清。精心甄别一个<strong>最小可行工具集（MVTS）</strong>往往能显著提升长期交互中的稳定性与可维护性。</p>
+<p><strong>（3）示例（Few-shot）</strong></p>
+<p>始终推荐提供示例，但建议精挑细选一组<strong>多样且典型</strong>的示例，直接画像”期望行为”。对LLM而言，<strong>好的示例胜过千言万语</strong>。</p>
+<h3 id="2-2-即时（Just-in-time）上下文"><a href="#2-2-即时（Just-in-time）上下文" class="headerlink" title="2.2 即时（Just-in-time）上下文"></a>2.2 即时（Just-in-time）上下文</h3><p>工程实践正在从”推理前一次性检索”逐步过渡到”<strong>即时（Just-in-time, JIT）上下文</strong>“：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs angelscript">传统方式：<br><span class="hljs-string">[预先加载所有相关数据]</span> → 构建上下文 → 调用LLM<br><br>JIT方式：<br><span class="hljs-string">[维护轻量化引用(文件路径/存储查询/URL)]</span> → 按需加载 → 调用LLM<br></code></pre></td></tr></table></figure>
+
+<p>这种方式让模型撰写针对性查询、缓存必要结果，用<code>head</code>&#x2F;<code>tail</code>等命令分析大体量数据——无需把整块数据一次性塞入上下文。其认知模式更贴近人类：我们不会死记硬背全部信息，而是用文件系统、收件箱、书签等外部索引按需提取。</p>
+<h2 id="三、长时程任务的上下文工程"><a href="#三、长时程任务的上下文工程" class="headerlink" title="三、长时程任务的上下文工程"></a>三、长时程任务的上下文工程</h2><p>长时程任务要求智能体在超出上下文窗口的长序列行动中，仍能保持连贯性、上下文一致与目标导向。</p>
+<h3 id="3-1-三大核心策略"><a href="#3-1-三大核心策略" class="headerlink" title="3.1 三大核心策略"></a>3.1 三大核心策略</h3><p><strong>（1）压缩整合（Compaction）</strong></p>
+<p>当对话接近上下文上限时，对其进行高保真总结，并用该摘要重启一个新的上下文窗口。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 实践：让模型压缩并保留架构性决策、未解决缺陷、实现细节</span><br><span class="hljs-comment"># 丢弃重复的工具输出与噪声</span><br><span class="hljs-comment"># 新窗口携带压缩摘要 + 最近少量高相关工件</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>（2）结构化笔记（Structured note-taking）</strong></p>
+<p>智能体以固定频率将关键信息写入上下文外的持久化存储，在后续阶段按需拉回。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 以极低的上下文开销维持持久状态</span><br><span class="hljs-comment"># 维护TODO列表、项目NOTES.md、关键结论/依赖/阻塞项的索引</span><br><span class="hljs-comment"># 跨数十次工具调用与多轮上下文重置仍能保持进度与一致性</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>（3）子代理架构（Sub-agent architectures）</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 主代理：负责高层规划与综合</span><br><span class="hljs-comment"># 子代理：在&quot;干净的上下文窗口&quot;中各自深挖</span><br><span class="hljs-comment"># 最终：仅回传承凝练摘要(常见1,000-2,000 tokens)</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-2-方法取舍经验"><a href="#3-2-方法取舍经验" class="headerlink" title="3.2 方法取舍经验"></a>3.2 方法取舍经验</h3><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>压缩整合</strong></td>
+<td>需要长对话连续性的任务，强调上下文的”接力”</td>
+</tr>
+<tr>
+<td><strong>结构化笔记</strong></td>
+<td>有里程碑&#x2F;阶段性成果的迭代式开发与研究</td>
+</tr>
+<tr>
+<td><strong>子代理架构</strong></td>
+<td>复杂研究与分析，能从并行探索中获益</td>
+</tr>
+</tbody></table>
+<h2 id="四、HelloAgents-ContextBuilder：GSSC流水线"><a href="#四、HelloAgents-ContextBuilder：GSSC流水线" class="headerlink" title="四、HelloAgents ContextBuilder：GSSC流水线"></a>四、HelloAgents ContextBuilder：GSSC流水线</h2><h3 id="4-1-设计目标"><a href="#4-1-设计目标" class="headerlink" title="4.1 设计目标"></a>4.1 设计目标</h3><ol>
+<li><strong>统一入口</strong>：将”Gather-Select-Structure-Compress”抽象为可复用流水线</li>
+<li><strong>稳定形态</strong>：输出固定骨架的上下文模板，便于调试、A&#x2F;B测试与评估</li>
+<li><strong>预算守护</strong>：在token预算内尽量保留高价值信息，对超限上下文提供兜底压缩策略</li>
+<li><strong>最小规则</strong>：不引入来源&#x2F;优先级等复杂维度，基于相关性和新近性的简单评分机制</li>
+</ol>
+<h3 id="4-2-核心数据结构"><a href="#4-2-核心数据结构" class="headerlink" title="4.2 核心数据结构"></a>4.2 核心数据结构</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> dataclasses <span class="hljs-keyword">import</span> dataclass<br><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> <span class="hljs-type">Optional</span>, <span class="hljs-type">Dict</span>, <span class="hljs-type">Any</span><br><span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime<br><br><span class="hljs-meta">@dataclass</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ContextPacket</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;候选信息包&quot;&quot;&quot;</span><br>    content: <span class="hljs-built_in">str</span>                           <span class="hljs-comment"># 信息内容</span><br>    timestamp: datetime                    <span class="hljs-comment"># 时间戳</span><br>    token_count: <span class="hljs-built_in">int</span>                       <span class="hljs-comment"># Token数量</span><br>    relevance_score: <span class="hljs-built_in">float</span> = <span class="hljs-number">0.5</span>           <span class="hljs-comment"># 相关性分数(0.0-1.0)</span><br>    metadata: <span class="hljs-type">Optional</span>[<span class="hljs-type">Dict</span>[<span class="hljs-built_in">str</span>, <span class="hljs-type">Any</span>]] = <span class="hljs-literal">None</span>  <span class="hljs-comment"># 元数据</span><br><br><span class="hljs-meta">@dataclass</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ContextConfig</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;上下文构建配置&quot;&quot;&quot;</span><br>    max_tokens: <span class="hljs-built_in">int</span> = <span class="hljs-number">3000</span>                <span class="hljs-comment"># 最大token数量</span><br>    reserve_ratio: <span class="hljs-built_in">float</span> = <span class="hljs-number">0.2</span>            <span class="hljs-comment"># 为系统指令预留的比例</span><br>    min_relevance: <span class="hljs-built_in">float</span> = <span class="hljs-number">0.1</span>             <span class="hljs-comment"># 最低相关性阈值</span><br>    enable_compression: <span class="hljs-built_in">bool</span> = <span class="hljs-literal">True</span>        <span class="hljs-comment"># 是否启用压缩</span><br>    recency_weight: <span class="hljs-built_in">float</span> = <span class="hljs-number">0.3</span>            <span class="hljs-comment"># 新近性权重</span><br>    relevance_weight: <span class="hljs-built_in">float</span> = <span class="hljs-number">0.7</span>          <span class="hljs-comment"># 相关性权重</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-GSSC流水线详解"><a href="#4-3-GSSC流水线详解" class="headerlink" title="4.3 GSSC流水线详解"></a>4.3 GSSC流水线详解</h3><h4 id="Stage-1-Gather-—-多源信息汇集"><a href="#Stage-1-Gather-—-多源信息汇集" class="headerlink" title="Stage 1: Gather — 多源信息汇集"></a>Stage 1: Gather — 多源信息汇集</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">_gather</span>(<span class="hljs-params">self, user_query, conversation_history=<span class="hljs-literal">None</span>, </span><br><span class="hljs-params">            system_instructions=<span class="hljs-literal">None</span>, custom_packets=<span class="hljs-literal">None</span></span>):<br>    packets = []<br>    <br>    <span class="hljs-comment"># 1. 系统指令（最高优先级，不参与评分）</span><br>    <span class="hljs-keyword">if</span> system_instructions:<br>        packets.append(ContextPacket(<br>            content=system_instructions,<br>            timestamp=datetime.now(),<br>            token_count=<span class="hljs-variable language_">self</span>._count_tokens(system_instructions),<br>            relevance_score=<span class="hljs-number">1.0</span>,  <span class="hljs-comment"># 始终保留</span><br>            metadata=&#123;<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;system_instruction&quot;</span>, <span class="hljs-string">&quot;priority&quot;</span>: <span class="hljs-string">&quot;high&quot;</span>&#125;<br>        ))<br>    <br>    <span class="hljs-comment"># 2. 从记忆系统检索相关记忆</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.memory_tool:<br>        memory_results = <span class="hljs-variable language_">self</span>.memory_tool.run(&#123;<br>            <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;search&quot;</span>, <span class="hljs-string">&quot;query&quot;</span>: user_query, <span class="hljs-string">&quot;limit&quot;</span>: <span class="hljs-number">10</span><br>        &#125;)<br>        memory_packets = <span class="hljs-variable language_">self</span>._parse_memory_results(memory_results)<br>        packets.extend(memory_packets)<br>    <br>    <span class="hljs-comment"># 3. 从RAG系统检索相关知识</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.rag_tool:<br>        rag_results = <span class="hljs-variable language_">self</span>.rag_tool.run(&#123;<br>            <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;search&quot;</span>, <span class="hljs-string">&quot;query&quot;</span>: user_query, <span class="hljs-string">&quot;limit&quot;</span>: <span class="hljs-number">5</span><br>        &#125;)<br>        rag_packets = <span class="hljs-variable language_">self</span>._parse_rag_results(rag_results)<br>        packets.extend(rag_packets)<br>    <br>    <span class="hljs-comment"># 4. 对话历史（仅保留最近N条）</span><br>    <span class="hljs-keyword">if</span> conversation_history:<br>        recent_history = conversation_history[-<span class="hljs-number">5</span>:]<br>        <span class="hljs-keyword">for</span> msg <span class="hljs-keyword">in</span> recent_history:<br>            packets.append(ContextPacket(<br>                content=<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;msg.role&#125;</span>: <span class="hljs-subst">&#123;msg.content&#125;</span>&quot;</span>,<br>                timestamp=msg.timestamp,<br>                token_count=<span class="hljs-variable language_">self</span>._count_tokens(msg.content),<br>                relevance_score=<span class="hljs-number">0.6</span>,<br>                metadata=&#123;<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;conversation_history&quot;</span>, <span class="hljs-string">&quot;role&quot;</span>: msg.role&#125;<br>            ))<br>    <br>    <span class="hljs-keyword">return</span> packets<br></code></pre></td></tr></table></figure>
+
+<h4 id="Stage-2-Select-—-智能信息选择"><a href="#Stage-2-Select-—-智能信息选择" class="headerlink" title="Stage 2: Select — 智能信息选择"></a>Stage 2: Select — 智能信息选择</h4><p>核心评分公式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 综合分数 = 相关性权重 × 相关性 + 新近性权重 × 新近性</span><br>combined_score = (<br>    <span class="hljs-variable language_">self</span>.config.relevance_weight * packet.relevance_score +<br>    <span class="hljs-variable language_">self</span>.config.recency_weight * recency<br>)<br><br><span class="hljs-comment"># 时间近因性：24小时内保持高分，之后指数衰减</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">_calculate_recency</span>(<span class="hljs-params">self, timestamp: datetime</span>) -&gt; <span class="hljs-built_in">float</span>:<br>    age_hours = (datetime.now() - timestamp).total_seconds() / <span class="hljs-number">3600</span><br>    decay_factor = <span class="hljs-number">0.1</span><br>    recency_score = math.exp(-decay_factor * age_hours / <span class="hljs-number">24</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(<span class="hljs-number">0.1</span>, <span class="hljs-built_in">min</span>(<span class="hljs-number">1.0</span>, recency_score))<br><br><span class="hljs-comment"># 贪心选择：按分数从高到低填充，直到达到token上限</span><br><span class="hljs-keyword">for</span> score, packet <span class="hljs-keyword">in</span> scored_packets:<br>    <span class="hljs-keyword">if</span> current_tokens + packet.token_count &lt;= available_tokens:<br>        selected.append(packet)<br>        current_tokens += packet.token_count<br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-keyword">break</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="Stage-3-Structure-—-结构化输出"><a href="#Stage-3-Structure-—-结构化输出" class="headerlink" title="Stage 3: Structure — 结构化输出"></a>Stage 3: Structure — 结构化输出</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">_structure</span>(<span class="hljs-params">self, selected_packets, user_query</span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;将选中的信息包组织成结构化的上下文模板&quot;&quot;&quot;</span><br>    <br>    sections = []<br>    <br>    <span class="hljs-comment"># [Role &amp; Policies] - 明确Agent的角色定位和行为准则</span><br>    <span class="hljs-keyword">if</span> system_instructions:<br>        sections.append(<span class="hljs-string">&quot;[Role &amp; Policies]\n&quot;</span> + <span class="hljs-string">&quot;\n&quot;</span>.join(system_instructions))<br>    <br>    <span class="hljs-comment"># [Task] - 当前需要完成的具体任务</span><br>    sections.append(<span class="hljs-string">f&quot;[Task]\n<span class="hljs-subst">&#123;user_query&#125;</span>&quot;</span>)<br>    <br>    <span class="hljs-comment"># [Evidence] - 从外部知识库检索的证据信息</span><br>    <span class="hljs-keyword">if</span> evidence:<br>        sections.append(<span class="hljs-string">&quot;[Evidence]\n&quot;</span> + <span class="hljs-string">&quot;\n---\n&quot;</span>.join(evidence))<br>    <br>    <span class="hljs-comment"># [Context] - 历史对话和相关记忆</span><br>    <span class="hljs-keyword">if</span> context:<br>        sections.append(<span class="hljs-string">&quot;[Context]\n&quot;</span> + <span class="hljs-string">&quot;\n&quot;</span>.join(context))<br>    <br>    <span class="hljs-comment"># [Output] - 期望的输出格式和要求</span><br>    sections.append(<span class="hljs-string">&quot;[Output]\n请基于以上信息，提供准确、有据的回答。&quot;</span>)<br>    <br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;\n\n&quot;</span>.join(sections)<br></code></pre></td></tr></table></figure>
+
+<h4 id="Stage-4-Compress-—-兜底压缩"><a href="#Stage-4-Compress-—-兜底压缩" class="headerlink" title="Stage 4: Compress — 兜底压缩"></a>Stage 4: Compress — 兜底压缩</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">_compress</span>(<span class="hljs-params">self, context: <span class="hljs-built_in">str</span>, max_tokens: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;压缩超限的上下文，保持结构完整性&quot;&quot;&quot;</span><br>    current_tokens = <span class="hljs-variable language_">self</span>._count_tokens(context)<br>    <br>    <span class="hljs-keyword">if</span> current_tokens &lt;= max_tokens:<br>        <span class="hljs-keyword">return</span> context  <span class="hljs-comment"># 无需压缩</span><br>    <br>    <span class="hljs-comment"># 分区压缩：保持结构完整性</span><br>    sections = context.split(<span class="hljs-string">&quot;\n\n&quot;</span>)<br>    compressed_sections = []<br>    current_total = <span class="hljs-number">0</span><br>    <br>    <span class="hljs-keyword">for</span> section <span class="hljs-keyword">in</span> sections:<br>        section_tokens = <span class="hljs-variable language_">self</span>._count_tokens(section)<br>        <br>        <span class="hljs-keyword">if</span> current_total + section_tokens &lt;= max_tokens:<br>            compressed_sections.append(section)<br>            current_total += section_tokens<br>        <span class="hljs-keyword">else</span>:<br>            remaining_tokens = max_tokens - current_total<br>            <span class="hljs-keyword">if</span> remaining_tokens &gt; <span class="hljs-number">50</span>:<br>                truncated = <span class="hljs-variable language_">self</span>._truncate_text(section, remaining_tokens)<br>                compressed_sections.append(truncated + <span class="hljs-string">&quot;\n[... 内容已压缩 ...]&quot;</span>)<br>            <span class="hljs-keyword">break</span><br>    <br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;\n\n&quot;</span>.join(compressed_sections)<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-完整使用示例"><a href="#4-4-完整使用示例" class="headerlink" title="4.4 完整使用示例"></a>4.4 完整使用示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> hello_agents.context <span class="hljs-keyword">import</span> ContextBuilder, ContextConfig<br><span class="hljs-keyword">from</span> hello_agents.tools <span class="hljs-keyword">import</span> MemoryTool, RAGTool<br><br><span class="hljs-comment"># 初始化工具</span><br>memory_tool = MemoryTool(user_id=<span class="hljs-string">&quot;user123&quot;</span>)<br>rag_tool = RAGTool(knowledge_base_path=<span class="hljs-string">&quot;./knowledge_base&quot;</span>)<br><br><span class="hljs-comment"># 创建ContextBuilder</span><br>builder = ContextBuilder(<br>    memory_tool=memory_tool,<br>    rag_tool=rag_tool,<br>    config=ContextConfig(max_tokens=<span class="hljs-number">3000</span>, reserve_ratio=<span class="hljs-number">0.2</span>)<br>)<br><br><span class="hljs-comment"># 构建上下文</span><br>context = builder.build(<br>    user_query=<span class="hljs-string">&quot;如何优化Pandas的内存占用?&quot;</span>,<br>    conversation_history=[<br>        Message(content=<span class="hljs-string">&quot;我正在开发一个数据分析工具&quot;</span>, role=<span class="hljs-string">&quot;user&quot;</span>),<br>        Message(content=<span class="hljs-string">&quot;很好！您计划使用什么技术栈？&quot;</span>, role=<span class="hljs-string">&quot;assistant&quot;</span>),<br>        Message(content=<span class="hljs-string">&quot;我打算使用Python和Pandas&quot;</span>, role=<span class="hljs-string">&quot;user&quot;</span>),<br>    ],<br>    system_instructions=<span class="hljs-string">&quot;你是一位资深的Python数据工程顾问。&quot;</span><br>)<br><br><span class="hljs-comment"># 输出结构化的上下文：</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">[Role &amp; Policies]</span><br><span class="hljs-string">你是一位资深的Python数据工程顾问。</span><br><span class="hljs-string"></span><br><span class="hljs-string">[Task]</span><br><span class="hljs-string">如何优化Pandas的内存占用?</span><br><span class="hljs-string"></span><br><span class="hljs-string">[Evidence]</span><br><span class="hljs-string">Pandas内存优化的核心策略包括:</span><br><span class="hljs-string">1. 使用合适的数据类型(如category代替object)</span><br><span class="hljs-string">2. 分块读取大文件</span><br><span class="hljs-string">3. 使用chunksize参数</span><br><span class="hljs-string"></span><br><span class="hljs-string">[Context]</span><br><span class="hljs-string">user: 我正在开发一个数据分析工具</span><br><span class="hljs-string">记忆: 用户正在开发数据分析工具，使用Python和Pandas</span><br><span class="hljs-string"></span><br><span class="hljs-string">[Output]</span><br><span class="hljs-string">请基于以上信息，提供准确、有据的回答。</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-5-与Agent深度集成"><a href="#4-5-与Agent深度集成" class="headerlink" title="4.5 与Agent深度集成"></a>4.5 与Agent深度集成</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ContextAwareAgent</span>(<span class="hljs-title class_ inherited__">SimpleAgent</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;具有上下文感知能力的Agent&quot;&quot;&quot;</span><br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, name: <span class="hljs-built_in">str</span>, llm: HelloAgentsLLM, **kwargs</span>):<br>        <span class="hljs-built_in">super</span>().__init__(name=name, llm=llm)<br>        <br>        <span class="hljs-variable language_">self</span>.context_builder = ContextBuilder(<br>            memory_tool=MemoryTool(user_id=kwargs.get(<span class="hljs-string">&quot;user_id&quot;</span>, <span class="hljs-string">&quot;default&quot;</span>)),<br>            rag_tool=RAGTool(knowledge_base_path=kwargs.get(<span class="hljs-string">&quot;kb_path&quot;</span>, <span class="hljs-string">&quot;./kb&quot;</span>)),<br>            config=ContextConfig(max_tokens=<span class="hljs-number">4000</span>)<br>        )<br>        <span class="hljs-variable language_">self</span>.conversation_history = []<br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">run</span>(<span class="hljs-params">self, user_input: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>        <span class="hljs-comment"># 1. 构建优化的上下文</span><br>        optimized_context = <span class="hljs-variable language_">self</span>.context_builder.build(<br>            user_query=user_input,<br>            conversation_history=<span class="hljs-variable language_">self</span>.conversation_history,<br>            system_instructions=<span class="hljs-variable language_">self</span>.system_prompt<br>        )<br>        <br>        <span class="hljs-comment"># 2. 调用LLM</span><br>        messages = [<br>            &#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: optimized_context&#125;,<br>            &#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: user_input&#125;<br>        ]<br>        response = <span class="hljs-variable language_">self</span>.llm.invoke(messages)<br>        <br>        <span class="hljs-comment"># 3. 更新历史并记录记忆</span><br>        <span class="hljs-variable language_">self</span>.conversation_history.append(Message(user_input, <span class="hljs-string">&quot;user&quot;</span>))<br>        <span class="hljs-variable language_">self</span>.conversation_history.append(Message(response, <span class="hljs-string">&quot;assistant&quot;</span>))<br>        <br>        <span class="hljs-variable language_">self</span>.memory_tool.run(&#123;<br>            <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;add&quot;</span>,<br>            <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">f&quot;Q: <span class="hljs-subst">&#123;user_input&#125;</span>\nA: <span class="hljs-subst">&#123;response[:<span class="hljs-number">200</span>]&#125;</span>...&quot;</span>,<br>            <span class="hljs-string">&quot;memory_type&quot;</span>: <span class="hljs-string">&quot;episodic&quot;</span>, <span class="hljs-string">&quot;importance&quot;</span>: <span class="hljs-number">0.6</span><br>        &#125;)<br>        <br>        <span class="hljs-keyword">return</span> response<br></code></pre></td></tr></table></figure>
+
+<h2 id="五、NoteTool：结构化笔记"><a href="#五、NoteTool：结构化笔记" class="headerlink" title="五、NoteTool：结构化笔记"></a>五、NoteTool：结构化笔记</h2><p>NoteTool为”长时程任务”提供了结构化的外部记忆组件，以Markdown+YAML文件为载体，兼顾人类可读性和机器可解析性。</p>
+<h3 id="5-1-设计理念"><a href="#5-1-设计理念" class="headerlink" title="5.1 设计理念"></a>5.1 设计理念</h3><p>与MemoryTool的”对话式记忆”不同，NoteTool专注于<strong>项目式任务</strong>的长期追踪：</p>
+<ul>
+<li><strong>结构化记录</strong>：Markdown+YAML格式，机器可解析，人类可读</li>
+<li><strong>版本友好</strong>：纯文本格式，天然支持Git版本控制</li>
+<li><strong>低开销</strong>：无需复杂数据库操作，适合轻量级状态追踪</li>
+<li><strong>灵活分类</strong>：通过<code>type</code>和<code>tags</code>支持多维度检索</li>
+</ul>
+<h3 id="5-2-笔记文件格式"><a href="#5-2-笔记文件格式" class="headerlink" title="5.2 笔记文件格式"></a>5.2 笔记文件格式</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>id: note<span class="hljs-emphasis">_20250119_</span>153000<span class="hljs-emphasis">_0</span><br><span class="hljs-emphasis">title: 项目进展 - 第一阶段</span><br><span class="hljs-emphasis">type: task_</span>state<br>tags: [refactoring, phase1, backend]<br>created<span class="hljs-emphasis">_at: 2025-01-19T15:30:00</span><br><span class="hljs-emphasis">updated_</span>at: 2025-01-19T15:30:00<br>---<br><br><span class="hljs-section"># 项目进展 - 第一阶段</span><br><br><span class="hljs-section">## 完成情况</span><br><br>已完成数据模型层的重构，测试覆盖率达到85%。<br><br><span class="hljs-section">## 下一步计划</span><br><br><span class="hljs-bullet">1.</span> 重构业务逻辑层<br><span class="hljs-bullet">2.</span> 解决依赖冲突问题<br><span class="hljs-bullet">3.</span> 提升集成测试覆盖率至85%<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-3-核心操作"><a href="#5-3-核心操作" class="headerlink" title="5.3 核心操作"></a>5.3 核心操作</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> hello_agents.tools <span class="hljs-keyword">import</span> NoteTool<br><br>notes = NoteTool(workspace=<span class="hljs-string">&quot;./project_notes&quot;</span>)<br><br><span class="hljs-comment"># 创建笔记</span><br>note_id = notes.run(&#123;<br>    <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;create&quot;</span>,<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;重构项目 - 第一阶段&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;已完成数据模型层的重构，测试覆盖率达到85%。&quot;</span>,<br>    <span class="hljs-string">&quot;note_type&quot;</span>: <span class="hljs-string">&quot;task_state&quot;</span>,<br>    <span class="hljs-string">&quot;tags&quot;</span>: [<span class="hljs-string">&quot;refactoring&quot;</span>, <span class="hljs-string">&quot;phase1&quot;</span>]<br>&#125;)<br><br><span class="hljs-comment"># 搜索笔记</span><br>results = notes.run(&#123;<br>    <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;search&quot;</span>,<br>    <span class="hljs-string">&quot;query&quot;</span>: <span class="hljs-string">&quot;依赖冲突&quot;</span>,<br>    <span class="hljs-string">&quot;limit&quot;</span>: <span class="hljs-number">5</span><br>&#125;)<br><br><span class="hljs-comment"># 按类型过滤</span><br>blockers = notes.run(&#123;<br>    <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;list&quot;</span>,<br>    <span class="hljs-string">&quot;note_type&quot;</span>: <span class="hljs-string">&quot;blocker&quot;</span>,<br>    <span class="hljs-string">&quot;limit&quot;</span>: <span class="hljs-number">10</span><br>&#125;)<br><br><span class="hljs-comment"># 更新笔记</span><br>notes.run(&#123;<br>    <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;update&quot;</span>,<br>    <span class="hljs-string">&quot;note_id&quot;</span>: note_id,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;已解决依赖冲突问题，继续推进。&quot;</span><br>&#125;)<br><br><span class="hljs-comment"># 获取摘要</span><br>summary = notes.run(&#123;<span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;summary&quot;</span>&#125;)<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-4-笔记类型与最佳实践"><a href="#5-4-笔记类型与最佳实践" class="headerlink" title="5.4 笔记类型与最佳实践"></a>5.4 笔记类型与最佳实践</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>用途</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>blocker</code></td>
+<td>阻塞问题</td>
+<td>最高</td>
+</tr>
+<tr>
+<td><code>action</code></td>
+<td>行动计划</td>
+<td>高</td>
+</tr>
+<tr>
+<td><code>task_state</code></td>
+<td>阶段进展</td>
+<td>中</td>
+</tr>
+<tr>
+<td><code>conclusion</code></td>
+<td>重要结论</td>
+<td>中</td>
+</tr>
+<tr>
+<td><code>reference</code></td>
+<td>参考资料</td>
+<td>低</td>
+</tr>
+<tr>
+<td><code>general</code></td>
+<td>通用笔记</td>
+<td>低</td>
+</tr>
+</tbody></table>
+<p><strong>最佳实践</strong>：</p>
+<ul>
+<li>定期将已解决的blocker更新为conclusion</li>
+<li>使用tags进行版本管理，如<code>[&quot;v1.0&quot;, &quot;completed&quot;]</code></li>
+<li>在关键阶段人工审核Agent生成的笔记</li>
+<li>结合Git进行版本控制，追踪笔记演化</li>
+</ul>
+<h2 id="六、TerminalTool：即时文件系统访问"><a href="#六、TerminalTool：即时文件系统访问" class="headerlink" title="六、TerminalTool：即时文件系统访问"></a>六、TerminalTool：即时文件系统访问</h2><p>TerminalTool为智能体提供了<strong>安全的命令行执行能力</strong>，支持JIT（Just-in-time）上下文理念——智能体不需要预先加载所有文件，而是按需探索和检索。</p>
+<h3 id="6-1-设计理念与安全机制"><a href="#6-1-设计理念与安全机制" class="headerlink" title="6.1 设计理念与安全机制"></a>6.1 设计理念与安全机制</h3><p><strong>四层安全防护</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>机制</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>第一层</strong></td>
+<td>命令白名单</td>
+<td>只允许<code>ls</code>,<code>cat</code>,<code>head</code>,<code>tail</code>,<code>grep</code>,<code>find</code>等只读命令</td>
+</tr>
+<tr>
+<td><strong>第二层</strong></td>
+<td>工作目录限制</td>
+<td>只能访问指定workspace，无法访问系统其他部分</td>
+</tr>
+<tr>
+<td><strong>第三层</strong></td>
+<td>超时控制</td>
+<td>每个命令有执行时间限制（默认30秒）</td>
+</tr>
+<tr>
+<td><strong>第四层</strong></td>
+<td>输出大小限制</td>
+<td>限制命令输出大小（默认10MB）</td>
+</tr>
+</tbody></table>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">ALLOWED_COMMANDS = &#123;<br>    <span class="hljs-string">&#x27;ls&#x27;</span>, <span class="hljs-string">&#x27;dir&#x27;</span>, <span class="hljs-string">&#x27;tree&#x27;</span>,           <span class="hljs-comment"># 文件列表</span><br>    <span class="hljs-string">&#x27;cat&#x27;</span>, <span class="hljs-string">&#x27;head&#x27;</span>, <span class="hljs-string">&#x27;tail&#x27;</span>,         <span class="hljs-comment"># 文件内容查看</span><br>    <span class="hljs-string">&#x27;find&#x27;</span>, <span class="hljs-string">&#x27;grep&#x27;</span>, <span class="hljs-string">&#x27;egrep&#x27;</span>,       <span class="hljs-comment"># 文件搜索</span><br>    <span class="hljs-string">&#x27;wc&#x27;</span>, <span class="hljs-string">&#x27;sort&#x27;</span>, <span class="hljs-string">&#x27;uniq&#x27;</span>, <span class="hljs-string">&#x27;cut&#x27;</span>,   <span class="hljs-comment"># 文本处理</span><br>    <span class="hljs-string">&#x27;pwd&#x27;</span>, <span class="hljs-string">&#x27;cd&#x27;</span>,                   <span class="hljs-comment"># 目录操作</span><br>    <span class="hljs-string">&#x27;file&#x27;</span>, <span class="hljs-string">&#x27;stat&#x27;</span>, <span class="hljs-string">&#x27;du&#x27;</span>, <span class="hljs-string">&#x27;df&#x27;</span>,    <span class="hljs-comment"># 文件信息</span><br>    <span class="hljs-string">&#x27;echo&#x27;</span>, <span class="hljs-string">&#x27;which&#x27;</span>, <span class="hljs-string">&#x27;whereis&#x27;</span>,     <span class="hljs-comment"># 其他</span><br>&#125;<br><br><span class="hljs-comment"># ❌ 不允许：rm, mv, chmod, sudo等修改操作</span><br><span class="hljs-comment"># ❌ 不允许：访问workspace外的路径</span><br><span class="hljs-comment"># ❌ 不允许：超过超时限制的长时命令</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-典型使用模式"><a href="#6-2-典型使用模式" class="headerlink" title="6.2 典型使用模式"></a>6.2 典型使用模式</h3><p><strong>探索式导航</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">terminal = TerminalTool(workspace=<span class="hljs-string">&quot;./my_project&quot;</span>)<br><br><span class="hljs-comment"># 查看项目结构</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;ls -la&quot;</span>&#125;)<br><br><span class="hljs-comment"># 进入源码目录</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;cd src&quot;</span>&#125;)<br><br><span class="hljs-comment"># 查找特定文件</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;find . -name &#x27;*service*.py&#x27;&quot;</span>&#125;)<br><br><span class="hljs-comment"># 查看文件内容</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;cat user_service.py | head -n 50&quot;</span>&#125;)<br></code></pre></td></tr></table></figure>
+
+<p><strong>数据文件分析</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 查看CSV前几行</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;head -n 5 data/sales.csv&quot;</span>&#125;)<br><br><span class="hljs-comment"># 统计行数</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;wc -l *.csv&quot;</span>&#125;)<br><br><span class="hljs-comment"># 提取列名</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;head -n 1 data/sales.csv | tr &#x27;,&#x27; &#x27;\n&#x27;&quot;</span>&#125;)<br></code></pre></td></tr></table></figure>
+
+<p><strong>日志文件分析</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 查看最新错误</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;tail -n 100 app.log | grep ERROR&quot;</span>&#125;)<br><br><span class="hljs-comment"># 统计错误分布</span><br>terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;grep ERROR app.log | awk &#x27;&#123;print $4&#125;&#x27; | sort | uniq -c&quot;</span>&#125;)<br></code></pre></td></tr></table></figure>
+
+<h3 id="6-3-与其他工具的协同"><a href="#6-3-与其他工具的协同" class="headerlink" title="6.3 与其他工具的协同"></a>6.3 与其他工具的协同</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># TerminalTool发现的信息存储到记忆系统</span><br>structure = terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;tree -L 2 src&quot;</span>&#125;)<br>memory_tool.run(&#123;<br>    <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;add&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">f&quot;项目结构:\n<span class="hljs-subst">&#123;structure&#125;</span>&quot;</span>,<br>    <span class="hljs-string">&quot;memory_type&quot;</span>: <span class="hljs-string">&quot;semantic&quot;</span>, <span class="hljs-string">&quot;importance&quot;</span>: <span class="hljs-number">0.8</span><br>&#125;)<br><br><span class="hljs-comment"># 重要发现记录为笔记</span><br>log_analysis = terminal.run(&#123;<span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;grep &#x27;slow query&#x27; app.log&quot;</span>&#125;)<br>note_tool.run(&#123;<br>    <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;create&quot;</span>,<br>    <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">&quot;数据库慢查询问题&quot;</span>,<br>    <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">f&quot;## 问题描述\n<span class="hljs-subst">&#123;log_analysis&#125;</span>\n\n## 下一步\n分析SQL并添加索引&quot;</span>,<br>    <span class="hljs-string">&quot;note_type&quot;</span>: <span class="hljs-string">&quot;blocker&quot;</span>,<br>    <span class="hljs-string">&quot;tags&quot;</span>: [<span class="hljs-string">&quot;performance&quot;</span>, <span class="hljs-string">&quot;database&quot;</span>]<br>&#125;)<br><br><span class="hljs-comment"># TerminalTool输出作为ContextPacket</span><br><span class="hljs-keyword">from</span> hello_agents.context <span class="hljs-keyword">import</span> ContextPacket<br>packets = [<br>    ContextPacket(<br>        content=<span class="hljs-string">f&quot;代码库结构:\n<span class="hljs-subst">&#123;structure&#125;</span>&quot;</span>,<br>        timestamp=datetime.now(),<br>        token_count=<span class="hljs-built_in">len</span>(structure) // <span class="hljs-number">4</span>,<br>        relevance_score=<span class="hljs-number">0.7</span>,<br>        metadata=&#123;<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;code_structure&quot;</span>, <span class="hljs-string">&quot;source&quot;</span>: <span class="hljs-string">&quot;terminal&quot;</span>&#125;<br>    )<br>]<br></code></pre></td></tr></table></figure>
+
+<h2 id="七、实战：长程代码库维护助手"><a href="#七、实战：长程代码库维护助手" class="headerlink" title="七、实战：长程代码库维护助手"></a>七、实战：长程代码库维护助手</h2><h3 id="7-1-系统架构"><a href="#7-1-系统架构" class="headerlink" title="7.1 系统架构"></a>7.1 系统架构</h3><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs stata">┌─────────────────────────────────────────────────────────┐<br>│                    用户交互层                            │<br>│              (<span class="hljs-keyword">CLI</span> / Gradio / API)                       │<br>└─────────────────────────────────────────────────────────┘<br>                            ↓<br>┌─────────────────────────────────────────────────────────┐<br>│                    Agent核心层                           │<br>│              ContextAwareAgent                          │<br>│         (对话管理 + 工具协调 + 上下文构建)                │<br>└─────────────────────────────────────────────────────────┘<br>                            ↓<br>┌─────────────────────────────────────────────────────────┐<br>│                    工具层                                │<br>│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐  │<br>│  │Context   │  │ <span class="hljs-keyword">Memory</span>   │  │ <span class="hljs-keyword">Note</span>     │  │Terminal │  │<br>│  │Builder   │  │Tool      │  │Tool      │  │Tool     │  │<br>│  └──────────┘  └──────────┘  └──────────┘  └─────────┘  │<br>│     GSSC         对话记忆      持久笔记      即时访问     │<br>│     流水线                                               │<br>└─────────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-2-核心类实现"><a href="#7-2-核心类实现" class="headerlink" title="7.2 核心类实现"></a>7.2 核心类实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">CodebaseMaintainer</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;代码库维护助手 - 长程智能体&quot;&quot;&quot;</span><br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, project_name: <span class="hljs-built_in">str</span>, codebase_path: <span class="hljs-built_in">str</span></span>):<br>        <span class="hljs-variable language_">self</span>.project_name = project_name<br>        <span class="hljs-variable language_">self</span>.codebase_path = codebase_path<br>        <br>        <span class="hljs-comment"># 初始化工具</span><br>        <span class="hljs-variable language_">self</span>.memory_tool = MemoryTool(user_id=project_name)<br>        <span class="hljs-variable language_">self</span>.note_tool = NoteTool(workspace=<span class="hljs-string">f&quot;./<span class="hljs-subst">&#123;project_name&#125;</span>_notes&quot;</span>)<br>        <span class="hljs-variable language_">self</span>.terminal_tool = TerminalTool(workspace=codebase_path, timeout=<span class="hljs-number">60</span>)<br>        <br>        <span class="hljs-comment"># 初始化上下文构建器</span><br>        <span class="hljs-variable language_">self</span>.context_builder = ContextBuilder(<br>            memory_tool=<span class="hljs-variable language_">self</span>.memory_tool,<br>            rag_tool=<span class="hljs-literal">None</span>,<br>            config=ContextConfig(max_tokens=<span class="hljs-number">4000</span>, reserve_ratio=<span class="hljs-number">0.15</span>)<br>        )<br>        <br>        <span class="hljs-variable language_">self</span>.conversation_history = []<br>        <span class="hljs-variable language_">self</span>.stats = &#123;<span class="hljs-string">&quot;commands_executed&quot;</span>: <span class="hljs-number">0</span>, <span class="hljs-string">&quot;notes_created&quot;</span>: <span class="hljs-number">0</span>&#125;<br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">run</span>(<span class="hljs-params">self, user_input: <span class="hljs-built_in">str</span>, mode: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;auto&quot;</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>        <span class="hljs-string">&quot;&quot;&quot;运行助手</span><br><span class="hljs-string">        </span><br><span class="hljs-string">        mode:</span><br><span class="hljs-string">        - &quot;auto&quot;:   自动决策</span><br><span class="hljs-string">        - &quot;explore&quot;: 侧重代码探索</span><br><span class="hljs-string">        - &quot;analyze&quot;:  侧重问题分析</span><br><span class="hljs-string">        - &quot;plan&quot;:     侧重任务规划</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br>        <span class="hljs-comment"># 1. 根据模式预处理</span><br>        pre_context = <span class="hljs-variable language_">self</span>._preprocess_by_mode(user_input, mode)<br>        <br>        <span class="hljs-comment"># 2. 检索相关笔记（优先blocker）</span><br>        relevant_notes = <span class="hljs-variable language_">self</span>._retrieve_relevant_notes(user_input)<br>        note_packets = <span class="hljs-variable language_">self</span>._notes_to_packets(relevant_notes)<br>        <br>        <span class="hljs-comment"># 3. 构建优化上下文</span><br>        context = <span class="hljs-variable language_">self</span>.context_builder.build(<br>            user_query=user_input,<br>            conversation_history=<span class="hljs-variable language_">self</span>.conversation_history,<br>            system_instructions=<span class="hljs-variable language_">self</span>._build_system_instructions(mode),<br>            custom_packets=note_packets + pre_context<br>        )<br>        <br>        <span class="hljs-comment"># 4. 调用LLM</span><br>        response = <span class="hljs-variable language_">self</span>.llm.invoke(context)<br>        <br>        <span class="hljs-comment"># 5. 后处理：自动创建笔记</span><br>        <span class="hljs-variable language_">self</span>._postprocess_response(user_input, response)<br>        <br>        <span class="hljs-comment"># 6. 更新历史</span><br>        <span class="hljs-variable language_">self</span>._update_history(user_input, response)<br>        <br>        <span class="hljs-keyword">return</span> response<br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">_preprocess_by_mode</span>(<span class="hljs-params">self, user_input: <span class="hljs-built_in">str</span>, mode: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-type">List</span>[ContextPacket]:<br>        packets = []<br>        <br>        <span class="hljs-keyword">if</span> mode <span class="hljs-keyword">in</span> (<span class="hljs-string">&quot;explore&quot;</span>, <span class="hljs-string">&quot;auto&quot;</span>):<br>            <span class="hljs-comment"># 探索模式：自动查看项目结构</span><br>            structure = <span class="hljs-variable language_">self</span>.terminal_tool.run(&#123;<br>                <span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;find . -type f -name &#x27;*.py&#x27; | head -n 20&quot;</span><br>            &#125;)<br>            <span class="hljs-variable language_">self</span>.stats[<span class="hljs-string">&quot;commands_executed&quot;</span>] += <span class="hljs-number">1</span><br>            packets.append(ContextPacket(<br>                content=<span class="hljs-string">f&quot;[代码库结构]\n<span class="hljs-subst">&#123;structure&#125;</span>&quot;</span>,<br>                timestamp=datetime.now(),<br>                token_count=<span class="hljs-built_in">len</span>(structure) // <span class="hljs-number">4</span>,<br>                relevance_score=<span class="hljs-number">0.6</span>,<br>                metadata=&#123;<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;code_structure&quot;</span>, <span class="hljs-string">&quot;source&quot;</span>: <span class="hljs-string">&quot;terminal&quot;</span>&#125;<br>            ))<br>        <br>        <span class="hljs-keyword">if</span> mode == <span class="hljs-string">&quot;analyze&quot;</span>:<br>            <span class="hljs-comment"># 分析模式：检查代码质量</span><br>            loc = <span class="hljs-variable language_">self</span>.terminal_tool.run(&#123;<br>                <span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;find . -name &#x27;*.py&#x27; -exec wc -l &#123;&#125; + | tail -n 1&quot;</span><br>            &#125;)<br>            todos = <span class="hljs-variable language_">self</span>.terminal_tool.run(&#123;<br>                <span class="hljs-string">&quot;command&quot;</span>: <span class="hljs-string">&quot;grep -rn &#x27;TODO\\|FIXME&#x27; --include=&#x27;*.py&#x27; | head -n 10&quot;</span><br>            &#125;)<br>            <span class="hljs-variable language_">self</span>.stats[<span class="hljs-string">&quot;commands_executed&quot;</span>] += <span class="hljs-number">2</span><br>            packets.append(ContextPacket(<br>                content=<span class="hljs-string">f&quot;[代码统计]\n<span class="hljs-subst">&#123;loc&#125;</span>\n\n[待办]\n<span class="hljs-subst">&#123;todos&#125;</span>&quot;</span>,<br>                timestamp=datetime.now(),<br>                token_count=(<span class="hljs-built_in">len</span>(loc) + <span class="hljs-built_in">len</span>(todos)) // <span class="hljs-number">4</span>,<br>                relevance_score=<span class="hljs-number">0.7</span>,<br>                metadata=&#123;<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;code_analysis&quot;</span>, <span class="hljs-string">&quot;source&quot;</span>: <span class="hljs-string">&quot;terminal&quot;</span>&#125;<br>            ))<br>        <br>        <span class="hljs-keyword">return</span> packets<br>    <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">_postprocess_response</span>(<span class="hljs-params">self, user_input: <span class="hljs-built_in">str</span>, response: <span class="hljs-built_in">str</span></span>):<br>        <span class="hljs-string">&quot;&quot;&quot;后处理：自动记录重要信息&quot;&quot;&quot;</span><br>        <span class="hljs-comment"># 发现问题 → 创建blocker笔记</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">any</span>(k <span class="hljs-keyword">in</span> response.lower() <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> [<span class="hljs-string">&quot;问题&quot;</span>, <span class="hljs-string">&quot;bug&quot;</span>, <span class="hljs-string">&quot;错误&quot;</span>, <span class="hljs-string">&quot;阻塞&quot;</span>]):<br>            <span class="hljs-variable language_">self</span>.note_tool.run(&#123;<br>                <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;create&quot;</span>,<br>                <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">f&quot;发现问题: <span class="hljs-subst">&#123;user_input[:<span class="hljs-number">30</span>]&#125;</span>...&quot;</span>,<br>                <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">f&quot;## 用户输入\n<span class="hljs-subst">&#123;user_input&#125;</span>\n\n## 分析\n<span class="hljs-subst">&#123;response[:<span class="hljs-number">500</span>]&#125;</span>...&quot;</span>,<br>                <span class="hljs-string">&quot;note_type&quot;</span>: <span class="hljs-string">&quot;blocker&quot;</span>,<br>                <span class="hljs-string">&quot;tags&quot;</span>: [<span class="hljs-variable language_">self</span>.project_name, <span class="hljs-string">&quot;auto_detected&quot;</span>]<br>            &#125;)<br>            <span class="hljs-variable language_">self</span>.stats[<span class="hljs-string">&quot;notes_created&quot;</span>] += <span class="hljs-number">1</span><br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;📝 已自动创建问题笔记&quot;</span>)<br>        <br>        <span class="hljs-comment"># 任务规划 → 创建action笔记</span><br>        <span class="hljs-keyword">elif</span> <span class="hljs-built_in">any</span>(k <span class="hljs-keyword">in</span> user_input.lower() <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> [<span class="hljs-string">&quot;计划&quot;</span>, <span class="hljs-string">&quot;下一步&quot;</span>, <span class="hljs-string">&quot;任务&quot;</span>]):<br>            <span class="hljs-variable language_">self</span>.note_tool.run(&#123;<br>                <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;create&quot;</span>,<br>                <span class="hljs-string">&quot;title&quot;</span>: <span class="hljs-string">f&quot;任务规划: <span class="hljs-subst">&#123;user_input[:<span class="hljs-number">30</span>]&#125;</span>...&quot;</span>,<br>                <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">f&quot;## 讨论\n<span class="hljs-subst">&#123;user_input&#125;</span>\n\n## 行动计划\n<span class="hljs-subst">&#123;response[:<span class="hljs-number">500</span>]&#125;</span>...&quot;</span>,<br>                <span class="hljs-string">&quot;note_type&quot;</span>: <span class="hljs-string">&quot;action&quot;</span>,<br>                <span class="hljs-string">&quot;tags&quot;</span>: [<span class="hljs-variable language_">self</span>.project_name, <span class="hljs-string">&quot;planning&quot;</span>]<br>            &#125;)<br>            <span class="hljs-variable language_">self</span>.stats[<span class="hljs-string">&quot;notes_created&quot;</span>] += <span class="hljs-number">1</span><br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;📝 已自动创建行动计划笔记&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-3-使用示例"><a href="#7-3-使用示例" class="headerlink" title="7.3 使用示例"></a>7.3 使用示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python">maintainer = CodebaseMaintainer(<br>    project_name=<span class="hljs-string">&quot;my_flask_app&quot;</span>,<br>    codebase_path=<span class="hljs-string">&quot;./my_flask_app&quot;</span><br>)<br><br><span class="hljs-comment"># 探索代码库</span><br>response = maintainer.explore()<br><br><span class="hljs-comment"># 分析代码质量</span><br>response = maintainer.analyze()<br><br><span class="hljs-comment"># 规划下一步</span><br>response = maintainer.plan_next_steps()<br><br><span class="hljs-comment"># 执行终端命令</span><br>result = maintainer.execute_command(<span class="hljs-string">&quot;grep -r &#x27;class UserService&#x27; .&quot;</span>)<br><br><span class="hljs-comment"># 创建笔记</span><br>maintainer.create_note(<br>    title=<span class="hljs-string">&quot;本周重构计划&quot;</span>,<br>    content=<span class="hljs-string">&quot;## 目标\n完成数据模型层优化\n\n## 任务\n- [ ] User.email添加唯一约束\n- [ ] Order添加时间字段&quot;</span>,<br>    note_type=<span class="hljs-string">&quot;task_state&quot;</span>,<br>    tags=[<span class="hljs-string">&quot;refactoring&quot;</span>, <span class="hljs-string">&quot;week1&quot;</span>]<br>)<br><br><span class="hljs-comment"># 生成报告</span><br>report = maintainer.generate_report()<br></code></pre></td></tr></table></figure>
+
+<h2 id="八、本章小结"><a href="#八、本章小结" class="headerlink" title="八、本章小结"></a>八、本章小结</h2><h3 id="理论层面"><a href="#理论层面" class="headerlink" title="理论层面"></a>理论层面</h3><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>核心要点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>上下文腐蚀</strong></td>
+<td>长上下文导致信息检索精度下降，上下文是稀缺资源</td>
+</tr>
+<tr>
+<td><strong>注意力预算</strong></td>
+<td>每新增一个token消耗注意力预算，边际收益递减</td>
+</tr>
+<tr>
+<td><strong>JIT上下文</strong></td>
+<td>即时按需加载，而非一次性预加载</td>
+</tr>
+<tr>
+<td><strong>三大策略</strong></td>
+<td>压缩整合、结构化笔记、子代理架构</td>
+</tr>
+</tbody></table>
+<h3 id="工程实践层面"><a href="#工程实践层面" class="headerlink" title="工程实践层面"></a>工程实践层面</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>职责</th>
+<th>核心特性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ContextBuilder</strong></td>
+<td>GSSC流水线</td>
+<td>Gather→Select→Structure→Compress</td>
+</tr>
+<tr>
+<td><strong>NoteTool</strong></td>
+<td>结构化笔记</td>
+<td>Markdown+YAML，人类可读，版本控制友好</td>
+</tr>
+<tr>
+<td><strong>TerminalTool</strong></td>
+<td>即时文件访问</td>
+<td>四层安全机制，白名单命令，沙箱隔离</td>
+</tr>
+</tbody></table>
+<h3 id="分层上下文管理架构"><a href="#分层上下文管理架构" class="headerlink" title="分层上下文管理架构"></a>分层上下文管理架构</h3><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs scss">即时访问层 (TerminalTool)<br>    ↓  发现信息<br>会话记忆层 (MemoryTool)<br>    ↓  提炼总结<br>持久笔记层 (NoteTool)<br>    ↓  注入上下文<br>上下文构建层 (ContextBuilder)<br>    ↓  GSSC流水线<br>Agent推理层 (LLM)<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>本章知识点整理自 Datawhale《Hello-Agents》第九章，GitHub 地址：<a target="_blank" rel="noopener" href="https://github.com/jjyaoao/HelloAgents">https://github.com/jjyaoao/HelloAgents</a></p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%96%B0%E5%85%B4%E6%8A%80%E6%9C%AF/" class="category-chain-item">新兴技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+        <a href="/tags/Agent/" class="print-no-link">#Agent</a>
+      
+        <a href="/tags/%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8B/" class="print-no-link">#上下文工程</a>
+      
+        <a href="/tags/ContextBuilder/" class="print-no-link">#ContextBuilder</a>
+      
+        <a href="/tags/NoteTool/" class="print-no-link">#NoteTool</a>
+      
+        <a href="/tags/TerminalTool/" class="print-no-link">#TerminalTool</a>
+      
+        <a href="/tags/GSSC/" class="print-no-link">#GSSC</a>
+      
+        <a href="/tags/%E9%95%BF%E7%A8%8B%E4%BB%BB%E5%8A%A1/" class="print-no-link">#长程任务</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>AI上下文工程与长程智能体实战-ContextBuilder-NoteTool-TerminalTool</div>
+      <div>https://1441754257.github.io/2025/04/16/AI上下文工程与长程智能体实战-ContextBuilder-NoteTool-TerminalTool/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>贾一</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年4月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/04/15/AI%E6%99%BA%E8%83%BD%E4%BD%93%E8%AE%B0%E5%BF%86%E4%B8%8E%E6%A3%80%E7%B4%A2%E7%B3%BB%E7%BB%9F-%E4%BB%8E%E8%AE%A4%E7%9F%A5%E7%A7%91%E5%AD%A6%E5%88%B0RAG%E5%AE%9E%E6%88%98/" title="AI智能体记忆与检索系统-从认知科学到RAG实战">
+                        <span class="hidden-mobile">AI智能体记忆与检索系统-从认知科学到RAG实战</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
